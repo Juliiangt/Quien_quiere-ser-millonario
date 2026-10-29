@@ -1,0 +1,935 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>¿Quién quiere ser millonario?</title>
+<style>
+body{margin:0;padding:16px;background:#040922}
+#juego{--oro:#f5b700;--oro2:#ffe08a;--borde:#6f88f0;font-family:"Segoe UI",Roboto,Arial,sans-serif;max-width:1000px;margin:auto;color:#fff;border-radius:22px;padding:22px;background:radial-gradient(ellipse at 50% -10%,#3552c9 0%,#0a1642 55%,#040922 100%);box-shadow:0 14px 44px rgba(0,0,0,.5);box-sizing:border-box;overflow:hidden}
+#juego *{box-sizing:border-box}
+#juego .cabecera{text-align:center;margin-bottom:14px}
+#juego .logo{font-size:40px;line-height:1;filter:drop-shadow(0 0 12px rgba(245,183,0,.8))}
+#juego h1{margin:4px 0 0 0;font-size:28px;letter-spacing:1px;text-transform:uppercase;background:linear-gradient(90deg,#ffe08a,#f5b700,#ff9f1a);-webkit-background-clip:text;background-clip:text;color:transparent}
+#juego .sub{opacity:.75;font-size:13px;margin-top:2px}
+#juego h3{margin:0 0 10px 0;color:var(--oro2);font-size:15px;text-transform:uppercase;letter-spacing:.5px}
+#juego .seccion{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:14px;margin-bottom:12px}
+#juego .aviso{display:none;padding:11px 14px;border-radius:12px;margin-bottom:12px;font-weight:700;animation:entrar .3s ease}
+#juego .btn{padding:10px 14px;border:none;border-radius:10px;cursor:pointer;font-weight:700;font-size:14px;margin:3px 4px 3px 0;color:#fff;transition:transform .12s,filter .12s;font-family:inherit}
+#juego .btn:hover:not(:disabled){transform:translateY(-1px);filter:brightness(1.15)}
+#juego .btn:disabled{opacity:.35;cursor:not-allowed}
+#juego .jugar{display:block;width:100%;padding:16px;font-size:20px;margin:6px 0 0 0;background:linear-gradient(180deg,#ffd54a,#f5a300);color:#1b1300;border-radius:14px;letter-spacing:1px;box-shadow:0 6px 18px rgba(245,163,0,.45)}
+#juego .num{width:52px;height:52px;border-radius:50%;font-size:20px;border:2px solid var(--borde);background:rgba(255,255,255,.08);color:#fff;cursor:pointer;margin:0 8px 8px 0;font-weight:800;font-family:inherit}
+#juego .num.sel,#juego .chip.sel,#juego .tarjeta.sel{border-color:var(--oro);background:rgba(245,183,0,.2);box-shadow:0 0 16px rgba(245,183,0,.5)}
+#juego .chips{display:flex;flex-wrap:wrap;gap:8px}
+#juego .chip{padding:10px 14px;border-radius:30px;border:2px solid var(--borde);background:rgba(255,255,255,.08);color:#fff;cursor:pointer;font-size:14px;font-weight:600;font-family:inherit;transition:.15s}
+#juego .tarjetas{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+#juego .tarjeta{text-align:left;padding:14px;border-radius:16px;border:2px solid var(--borde);background:rgba(255,255,255,.08);color:#fff;cursor:pointer;font-family:inherit;transition:.15s}
+#juego .tarjeta .t-titulo{font-size:19px;font-weight:800;margin-bottom:4px}
+#juego .tarjeta .t-linea{font-size:13px;opacity:.9;margin-top:3px}
+#juego .tarjeta .t-premio{font-size:14px;font-weight:800;color:var(--oro2);margin-top:6px}
+#juego input{width:100%;padding:11px 12px;font-size:15px;border-radius:10px;border:2px solid transparent;background:#fff;color:#111;margin:4px 0 6px 0;font-family:inherit}
+#juego input:focus{outline:none;border-color:var(--oro)}
+#juego .fichas{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+#juego .ficha{padding:7px 14px;border-radius:30px;background:rgba(255,255,255,.1);border:2px solid transparent;font-size:13px;font-weight:700}
+#juego .ficha.activa{border-color:var(--oro);background:rgba(245,183,0,.22);box-shadow:0 0 14px rgba(245,183,0,.55)}
+#juego .ficha.fuera{opacity:.5}
+#juego .tablero{display:grid;grid-template-columns:1fr 200px;gap:16px}
+#juego .info{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+#juego .etq{padding:4px 11px;border-radius:20px;background:rgba(255,255,255,.14);font-size:12px;font-weight:700}
+#juego .etq.oro{background:rgba(245,183,0,.25);color:var(--oro2)}
+#juego .pregunta{font-size:20px;line-height:1.4;text-align:center;padding:22px 16px;border-radius:18px;border:2px solid var(--borde);background:linear-gradient(180deg,#1b3496,#0d1c58);box-shadow:inset 0 0 22px rgba(0,0,0,.35),0 4px 14px rgba(0,0,0,.35);margin-bottom:12px;animation:entrar .35s ease}
+#juego .opciones{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#juego .op{display:flex;align-items:center;gap:8px;width:100%;padding:13px 18px;font-size:16px;text-align:left;color:#fff;cursor:pointer;border-radius:40px;border:2px solid var(--borde);background:linear-gradient(180deg,#1b3496,#0d1c58);transition:.15s;font-family:inherit}
+#juego .op:hover:not(:disabled){border-color:var(--oro);box-shadow:0 0 14px rgba(245,183,0,.55)}
+#juego .op .letra{color:var(--oro);font-weight:800}
+#juego .op.ok{background:linear-gradient(180deg,#27c36f,#168a4c);border-color:#8dffbb;animation:pulso 1s ease 2}
+#juego .op.mal{background:linear-gradient(180deg,#e45a5a,#a82525);border-color:#ffb3b3}
+#juego .op.ok .letra,#juego .op.mal .letra{color:#fff}
+#juego .op:disabled{cursor:default}
+#juego .siguiente{display:block;width:100%;margin:12px 0 0 0;padding:14px;font-size:18px;background:linear-gradient(180deg,#27c36f,#168a4c);border-radius:14px;box-shadow:0 6px 16px rgba(39,195,111,.4)}
+#juego .comodines{margin-top:12px}
+#juego .panel{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:12px;margin-top:10px;animation:entrar .3s ease}
+#juego .barra{background:rgba(0,0,0,.35);border-radius:8px;height:18px;margin:2px 0 8px 0;overflow:hidden}
+#juego .relleno{background:linear-gradient(90deg,#ffd54a,#f5a300);height:18px;border-radius:8px;width:0%;transition:width .5s}
+#juego a.enlace{display:inline-block;padding:10px 14px;border-radius:10px;font-weight:700;text-decoration:none;color:#fff;margin:4px 6px 4px 0}
+#juego .escalera{background:rgba(0,0,0,.3);border-radius:16px;padding:8px;align-self:start}
+#juego .paso{padding:4px 10px;font-size:12.5px;border-radius:8px;margin:1px 0;color:#c8d2ff}
+#juego .paso.seguro{color:var(--oro2);font-weight:700}
+#juego .paso.superado{opacity:.5}
+#juego .paso.actual{background:linear-gradient(90deg,#ffd54a,#f5a300);color:#1b1300;font-weight:800}
+#juego .final{text-align:center}
+#juego .final h2{font-size:26px;margin:6px 0;color:var(--oro2)}
+#juego .tabla{max-width:560px;margin:12px auto}
+#juego .fila{padding:12px 14px;margin:6px 0;border-radius:12px;background:rgba(255,255,255,.1);font-size:16px;font-weight:700;text-align:left}
+#juego .fila:first-child{background:linear-gradient(90deg,rgba(245,183,0,.35),rgba(245,183,0,.12));border:1px solid var(--oro)}
+#juego .ranking{margin-top:16px;border-top:1px solid rgba(255,255,255,.18);padding-top:10px;font-size:14px}
+#juego .ranking ol{margin:6px 0;padding-left:22px}
+@keyframes entrar{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes pulso{0%,100%{box-shadow:0 0 0 rgba(141,255,187,0)}50%{box-shadow:0 0 24px rgba(141,255,187,.95)}}
+@media (max-width:720px){
+  #juego{padding:14px}
+  #juego h1{font-size:21px}
+  #juego .tablero{grid-template-columns:1fr}
+  #juego .opciones{grid-template-columns:1fr}
+  #juego .pregunta{font-size:17px}
+}
+</style>
+</head>
+<body>
+<div id="juego">
+  <div class="cabecera">
+    <div class="logo">💎</div>
+    <h1>¿Quién quiere ser millonario?</h1>
+    <div class="sub">Trivia de cultura general · 1 a 4 jugadores</div>
+  </div>
+  <div id="aviso" class="aviso"></div>
+
+  <div id="inicio">
+    <div class="seccion">
+      <h3>1 · Jugadores</h3>
+      <button id="num1" class="num sel" onclick="elegirJugadores(1)">1</button>
+        <button id="num2" class="num" onclick="elegirJugadores(2)">2</button>
+        <button id="num3" class="num" onclick="elegirJugadores(3)">3</button>
+        <button id="num4" class="num" onclick="elegirJugadores(4)">4</button>
+        
+      <div id="nombres"></div>
+    </div>
+    <div class="seccion">
+      <h3>2 · Categoría <span style="font-size:12px;opacity:.7;text-transform:none">(número de preguntas)</span></h3>
+      <div id="cats" class="chips"></div>
+    </div>
+    <div class="seccion">
+      <h3>3 · Dificultad y premios</h3>
+      <div id="difs" class="tarjetas"></div>
+    </div>
+    <button class="btn jugar" onclick="iniciar()">▶ ¡JUGAR!</button>
+  </div>
+
+  <div id="partida" style="display:none">
+    <div id="fichas" class="fichas"></div>
+    <div class="tablero">
+      <div>
+        <div id="info" class="info"></div>
+        <div id="pregunta" class="pregunta"></div>
+        <div id="opciones" class="opciones">
+          <button id="op0" class="op" onclick="responder(0)"></button>
+          <button id="op1" class="op" onclick="responder(1)"></button>
+          <button id="op2" class="op" onclick="responder(2)"></button>
+          <button id="op3" class="op" onclick="responder(3)"></button>
+          
+        </div>
+
+        <div id="zonaSiguiente" style="display:none">
+          <button id="btnSiguiente" class="btn siguiente" onclick="siguiente()"></button>
+        </div>
+
+        <div class="comodines">
+          <button id="btn5050" class="btn" onclick="cincuenta()" style="background:#1fa35c">50:50</button>
+          <button id="btnPublico" class="btn" onclick="abrirPublico()" style="background:#7d3cff">👥 Público</button>
+          <button id="btnAmigo" class="btn" onclick="abrirAmigo()" style="background:#1f8fd6">📞 Amigo</button>
+          <button id="btnBanco" class="btn" onclick="asegurar()" style="background:#f5b700;color:#1b1300">🔒 Asegurar dinero</button>
+          <button id="btnRetiro" class="btn" onclick="retirarse()" style="background:#d63b3b">🏳️ Retirarse</button>
+        </div>
+
+        <div id="panelPublico" class="panel" style="display:none">
+          <b>👥 Votación del público</b>
+          <div id="zonaQR" style="text-align:center;margin:8px 0">
+            <div style="font-size:14px">Escanea el código QR con el celular y elige una respuesta:</div>
+            <img id="qr" alt="Código QR" style="width:190px;height:190px;background:#fff;padding:6px;border-radius:10px;margin:8px 0">
+            <div id="urlVoto" style="font-size:12px;word-break:break-all"></div>
+          </div>
+          <div id="barras"></div>
+          <div id="totalVotos" style="font-size:13px"></div>
+          <button id="btnCerrar" class="btn" onclick="cerrarVotacion()" style="background:#d63b3b;margin-top:6px">Cerrar votación</button>
+        </div>
+
+        <div id="panelAmigo" class="panel" style="display:none">
+          <b>📞 Llamar a un amigo</b>
+          <div id="amigoForm">
+            <div style="margin-top:8px">1. Nombre de tu amigo</div>
+            <input id="amigoNombre" type="text" maxlength="30" placeholder="Ej: Carlos">
+            <div>2. Su número de celular</div>
+            <input id="amigoTelefono" type="tel" maxlength="20" placeholder="Ej: 300 123 4567">
+            <button class="btn" onclick="consultarAmigo()" style="background:#1f8fd6">Consultar</button>
+            <button class="btn" onclick="cancelarAmigo()" style="background:#555">Cancelar</button>
+          </div>
+          <div id="amigoResultado" style="display:none">
+            <p id="amigoTitulo" style="font-weight:700;margin:8px 0 2px 0"></p>
+            <p id="amigoInstruccion" style="margin:2px 0 8px 0"></p>
+            <a id="linkWhatsapp" class="enlace" target="_blank" rel="noopener" style="background:#25a244">💬 Abrir WhatsApp</a>
+            <a id="linkLlamar" class="enlace" target="_blank" rel="noopener" style="background:#1f8fd6">📞 Llamar</a>
+          </div>
+        </div>
+      </div>
+      <div id="escalera" class="escalera"></div>
+    </div>
+  </div>
+
+  <div id="final" class="final" style="display:none">
+    <div style="font-size:46px">🏆</div>
+    <h2 id="final_mensaje"></h2>
+    <p id="final_detalle" style="opacity:.85;margin:0"></p>
+    <div id="tabla" class="tabla"></div>
+    <button class="btn jugar" onclick="nuevaPartida()" style="max-width:360px;margin:10px auto 0 auto">↻ Jugar de nuevo</button>
+  </div>
+
+  <div class="ranking">
+    <b>🏆 Mejores partidas</b> <span id="partidas" style="font-size:12px;opacity:.75"></span>
+    <ol id="ranking"></ol>
+  </div>
+</div>
+
+<script>
+// ---- Motor del juego (la misma lógica de las funciones de Python del cuaderno) ----
+const MOTOR = (function () {
+  const LETRAS = ["A", "B", "C", "D"];
+  const BANCO = {"Geografía": {"Fácil": [["¿Cuál es la capital de Colombia?", "Bogotá", ["Medellín", "Cali", "Cartagena"]], ["¿Cuál es el idioma oficial de Brasil?", "Portugués", ["Español", "Inglés", "Francés"]], ["¿Cuál es el río más largo de Sudamérica?", "Amazonas", ["Orinoco", "Magdalena", "Paraná"]], ["¿Cuál es la capital de Francia?", "París", ["Londres", "Madrid", "Roma"]], ["¿Cuál es la moneda oficial de Colombia?", "Peso colombiano", ["Dólar", "Bolívar", "Sol"]], ["¿En qué país está la Torre Eiffel?", "Francia", ["Italia", "Alemania", "España"]], ["¿En qué continente está Egipto?", "África", ["Asia", "Europa", "Oceanía"]], ["¿Cuál es el océano más grande del mundo?", "Pacífico", ["Atlántico", "Índico", "Ártico"]], ["¿En qué país se encuentra el Coliseo romano?", "Italia", ["Grecia", "España", "Francia"]], ["¿Cuál es la capital de España?", "Madrid", ["Barcelona", "Sevilla", "Valencia"]], ["¿En qué país se encuentra la Gran Muralla?", "China", ["Japón", "India", "Mongolia"]], ["¿Cuál es el país más grande de Sudamérica?", "Brasil", ["Argentina", "Perú", "Colombia"]], ["¿Cuál es la capital de Italia?", "Roma", ["Milán", "Venecia", "Florencia"]], ["¿Cuál es la capital del Reino Unido?", "Londres", ["Mánchester", "Liverpool", "Dublín"]], ["¿En qué continente está Colombia?", "América", ["Europa", "África", "Asia"]], ["¿Cuál es la capital de México?", "Ciudad de México", ["Guadalajara", "Monterrey", "Cancún"]], ["¿En qué país se encuentra el Big Ben?", "Reino Unido", ["Francia", "Alemania", "Irlanda"]], ["¿Cuál es el continente más grande del mundo?", "Asia", ["África", "América", "Europa"]], ["¿Qué país tiene forma de bota en el mapa?", "Italia", ["España", "Grecia", "Portugal"]], ["¿Cuál es la capital de Venezuela?", "Caracas", ["Maracaibo", "Valencia", "Mérida"]], ["¿Cuál es la capital de Ecuador?", "Quito", ["Guayaquil", "Cuenca", "Lima"]], ["¿En qué país está la ciudad de Nueva York?", "Estados Unidos", ["Canadá", "Inglaterra", "Australia"]], ["¿Qué océano baña la costa occidental de Colombia?", "Pacífico", ["Atlántico", "Índico", "Ártico"]], ["¿En qué país está la ciudad de Río de Janeiro?", "Brasil", ["Argentina", "Portugal", "México"]], ["¿Cuál es la capital de Chile?", "Santiago", ["Valparaíso", "Buenos Aires", "Concepción"]], ["¿Qué país es famoso por sus canguros?", "Australia", ["Nueva Zelanda", "Sudáfrica", "India"]], ["¿Cuál es la capital de Portugal?", "Lisboa", ["Oporto", "Madrid", "Coímbra"]], ["¿Qué mar baña el norte de Colombia?", "Mar Caribe", ["Mar Mediterráneo", "Mar Rojo", "Mar Negro"]], ["¿En qué continente está Japón?", "Asia", ["Europa", "Oceanía", "América"]], ["¿En qué continente se encuentra el Polo Sur?", "Antártida", ["Ártico", "Oceanía", "Europa"]], ["¿Cuál es la capital de Cuba?", "La Habana", ["Santiago de Cuba", "Varadero", "San Juan"]], ["¿Cuál es la capital de Rusia?", "Moscú", ["San Petersburgo", "Kiev", "Varsovia"]], ["¿Qué país es conocido como “la tierra del sol naciente”?", "Japón", ["China", "Corea del Sur", "Tailandia"]], ["¿En qué país se encuentra la ciudad de Ámsterdam?", "Países Bajos", ["Bélgica", "Dinamarca", "Suiza"]], ["¿Cuál es la capital de Estados Unidos?", "Washington D. C.", ["Nueva York", "Los Ángeles", "Chicago"]], ["¿Qué océano separa a América de Europa?", "Atlántico", ["Pacífico", "Índico", "Ártico"]]], "Media": [["¿En qué río se encuentra la ciudad de Barranquilla?", "Magdalena", ["Cauca", "Atrato", "Putumayo"]], ["¿Cuál es la capital de Argentina?", "Buenos Aires", ["Montevideo", "Santiago", "Lima"]], ["¿Cuál es el país más grande del mundo por superficie?", "Rusia", ["Canadá", "China", "Estados Unidos"]], ["¿Cuál es la capital de Japón?", "Tokio", ["Kioto", "Osaka", "Seúl"]], ["¿Cuál es el desierto cálido más grande del mundo?", "Sahara", ["Gobi", "Atacama", "Kalahari"]], ["¿Cuál es la capital de Perú?", "Lima", ["Quito", "La Paz", "Bogotá"]], ["¿Cuál es la montaña más alta del mundo sobre el nivel del mar?", "Everest", ["K2", "Kilimanjaro", "Aconcagua"]], ["¿Cuál es la capital de Canadá?", "Ottawa", ["Toronto", "Vancouver", "Montreal"]], ["¿Cuál es la capital de Alemania?", "Berlín", ["Múnich", "Fráncfort", "Hamburgo"]], ["¿Cuál es la capital del departamento de Antioquia?", "Medellín", ["Manizales", "Bucaramanga", "Tunja"]], ["¿Qué ciudad colombiana es conocida como “La Ciudad Amurallada”?", "Cartagena", ["Santa Marta", "Barranquilla", "Popayán"]], ["¿Qué cordillera recorre Sudamérica de norte a sur?", "Los Andes", ["Los Alpes", "El Himalaya", "Las Rocosas"]], ["¿En qué ciudad colombiana se encuentra el Museo del Oro del Banco de la República más famoso?", "Bogotá", ["Medellín", "Cartagena", "Cali"]], ["¿Cuál es la capital del departamento del Valle del Cauca?", "Cali", ["Palmira", "Buenaventura", "Popayán"]], ["¿Cuál es la capital de Uruguay?", "Montevideo", ["Buenos Aires", "Asunción", "Punta del Este"]], ["¿Cuál es la capital de Paraguay?", "Asunción", ["Montevideo", "Encarnación", "La Paz"]], ["¿Cuál es la capital de Egipto?", "El Cairo", ["Alejandría", "Luxor", "Giza"]], ["¿Cuál es la capital de China?", "Pekín", ["Shanghái", "Hong Kong", "Cantón"]], ["¿Cuál es la capital de la India?", "Nueva Delhi", ["Bombay", "Calcuta", "Bangalore"]], ["¿Cuál es el departamento más grande de Colombia por superficie?", "Amazonas", ["Meta", "Antioquia", "Caquetá"]], ["¿En qué mar se encuentra la isla colombiana de San Andrés?", "Mar Caribe", ["Océano Pacífico", "Mar Mediterráneo", "Mar Rojo"]], ["¿Cuál es la capital de Corea del Sur?", "Seúl", ["Pionyang", "Busan", "Tokio"]], ["¿Cuál es el país con más habitantes del mundo?", "India", ["China", "Estados Unidos", "Indonesia"]], ["¿Qué río atraviesa la ciudad de París?", "Sena", ["Támesis", "Rin", "Danubio"]], ["¿Qué río atraviesa la ciudad de Londres?", "Támesis", ["Sena", "Danubio", "Tíber"]], ["¿Cuál es la capital de Grecia?", "Atenas", ["Esparta", "Tesalónica", "Creta"]], ["¿Cuál es el país más grande de Centroamérica?", "Nicaragua", ["Honduras", "Guatemala", "Panamá"]], ["¿Qué país centroamericano limita con Colombia?", "Panamá", ["Costa Rica", "Nicaragua", "Honduras"]], ["¿Cuál es la capital del departamento del Atlántico?", "Barranquilla", ["Cartagena", "Santa Marta", "Soledad"]], ["¿Cuál es la capital del departamento de Santander?", "Bucaramanga", ["Cúcuta", "Tunja", "San Gil"]], ["¿En qué departamento está el Parque Nacional Natural Tayrona?", "Magdalena", ["Bolívar", "La Guajira", "Cesar"]], ["¿Cuál es el país más grande de África por superficie?", "Argelia", ["República Democrática del Congo", "Sudán", "Egipto"]], ["¿Cuál es la isla más grande del mundo?", "Groenlandia", ["Madagascar", "Borneo", "Nueva Guinea"]], ["¿Qué canal une el océano Atlántico con el Pacífico en Centroamérica?", "Canal de Panamá", ["Canal de Suez", "Canal de la Mancha", "Canal de Kiel"]], ["¿Cuál es la capital de Suecia?", "Estocolmo", ["Oslo", "Copenhague", "Helsinki"]], ["¿Qué ciudad colombiana es conocida como “la ciudad de la eterna primavera”?", "Medellín", ["Cali", "Bucaramanga", "Pereira"]]], "Difícil": [["¿Cuál es la capital de Australia?", "Canberra", ["Sídney", "Melbourne", "Perth"]], ["¿Cuál es la capital de Turquía?", "Ankara", ["Estambul", "Esmirna", "Bursa"]], ["¿Cuál es el río más largo de Europa?", "Volga", ["Danubio", "Rin", "Sena"]], ["¿Cuál es el país más pequeño del mundo?", "Ciudad del Vaticano", ["Mónaco", "San Marino", "Liechtenstein"]], ["¿Cuál es la capital de Nueva Zelanda?", "Wellington", ["Auckland", "Christchurch", "Queenstown"]], ["¿En qué país se encuentra la antigua ciudad de Petra?", "Jordania", ["Egipto", "Siria", "Israel"]], ["¿Cuál es el país más poblado de África?", "Nigeria", ["Egipto", "Etiopía", "Sudáfrica"]], ["¿Qué país de Sudamérica tiene costas en el Pacífico y en el Caribe?", "Colombia", ["Venezuela", "Perú", "Ecuador"]], ["¿Cuál es el lago navegable más alto del mundo?", "Titicaca", ["Maracaibo", "Nicaragua", "Atitlán"]], ["¿Cuál es la capital de Mongolia?", "Ulán Bator", ["Astaná", "Biskek", "Taskent"]], ["¿Qué estrecho separa a España de África?", "Estrecho de Gibraltar", ["Bósforo", "Estrecho de Magallanes", "Canal de la Mancha"]], ["¿Cuál es la capital de Marruecos?", "Rabat", ["Casablanca", "Marrakech", "Fez"]], ["¿Cuál es la capital de Kazajistán?", "Astaná", ["Almaty", "Taskent", "Biskek"]], ["¿Cuál es la capital de Suiza?", "Berna", ["Zúrich", "Ginebra", "Basilea"]], ["¿Cuál es la capital de Brasil?", "Brasilia", ["Río de Janeiro", "São Paulo", "Salvador"]], ["¿Cuál es la capital de Nigeria?", "Abuya", ["Lagos", "Kano", "Ibadán"]], ["¿En qué cordillera colombiana se encuentra el Nevado del Ruiz?", "Cordillera Central", ["Cordillera Occidental", "Cordillera Oriental", "Sierra Nevada de Santa Marta"]], ["¿Cuál es la capital de Vietnam?", "Hanói", ["Ho Chi Minh", "Hue", "Da Nang"]], ["¿Cuál es el desierto no polar más árido del mundo?", "Atacama", ["Sahara", "Gobi", "Kalahari"]], ["¿Cuál es la capital de Pakistán?", "Islamabad", ["Karachi", "Lahore", "Peshawar"]], ["¿En qué país se encuentra el monte Kilimanjaro?", "Tanzania", ["Kenia", "Etiopía", "Uganda"]], ["¿Qué ciudad es la capital constitucional de Bolivia?", "Sucre", ["La Paz", "Santa Cruz", "Cochabamba"]], ["¿Cuál es la capital de Islandia?", "Reikiavik", ["Oslo", "Helsinki", "Nuuk"]], ["¿Cuáles son los dos países de Sudamérica que no tienen salida al mar?", "Bolivia y Paraguay", ["Bolivia y Uruguay", "Paraguay y Ecuador", "Uruguay y Paraguay"]], ["¿Qué departamento colombiano tiene como capital a Mitú?", "Vaupés", ["Guainía", "Vichada", "Guaviare"]], ["¿Cuál es la capital del departamento de Guainía?", "Inírida", ["Mitú", "Puerto Carreño", "San José del Guaviare"]], ["¿Qué estrecho separa a Asia de América?", "Estrecho de Bering", ["Estrecho de Gibraltar", "Estrecho de Magallanes", "Estrecho de Ormuz"]], ["¿Cuál es el lago más profundo del mundo?", "Baikal", ["Tanganica", "Superior", "Victoria"]], ["¿En qué país se encuentra la región de Transilvania?", "Rumania", ["Hungría", "Bulgaria", "Serbia"]], ["¿Cuál es la capital de Etiopía?", "Adís Abeba", ["Nairobi", "Asmara", "Jartum"]], ["¿En qué océano se encuentra la isla de Madagascar?", "Índico", ["Atlántico", "Pacífico", "Ártico"]], ["¿Qué cordillera se considera el límite entre Europa y Asia en Rusia?", "Montes Urales", ["Cáucaso", "Alpes", "Cárpatos"]], ["¿Cuál es la capital de Filipinas?", "Manila", ["Cebú", "Davao", "Quezón"]], ["¿En qué país nace el río Amazonas?", "Perú", ["Brasil", "Colombia", "Ecuador"]], ["¿Cuál es la capital de Arabia Saudita?", "Riad", ["Yeda", "La Meca", "Medina"]], ["¿En qué departamento colombiano se encuentra Caño Cristales?", "Meta", ["Guaviare", "Caquetá", "Vichada"]]]}, "Historia": {"Fácil": [["¿Quién fue el primer presidente de Estados Unidos?", "George Washington", ["Abraham Lincoln", "Thomas Jefferson", "John Adams"]], ["¿En qué año llegó Cristóbal Colón a América?", "1492", ["1453", "1500", "1519"]], ["¿Qué civilización construyó las pirámides de Giza?", "La egipcia", ["La maya", "La romana", "La griega"]], ["¿Qué civilización construyó Machu Picchu?", "Los incas", ["Los mayas", "Los aztecas", "Los romanos"]], ["¿Qué personaje es conocido como “El Libertador”, héroe de la independencia de Colombia?", "Simón Bolívar", ["Francisco de Paula Santander", "Antonio Nariño", "José de San Martín"]], ["¿Qué país regaló la Estatua de la Libertad a Estados Unidos?", "Francia", ["Inglaterra", "España", "Italia"]], ["¿Qué civilización antigua construyó el Coliseo de Roma?", "La romana", ["La griega", "La egipcia", "La persa"]], ["¿Quién fue la primera persona en pisar la Luna?", "Neil Armstrong", ["Buzz Aldrin", "Yuri Gagarin", "Alan Shepard"]], ["¿Qué día se celebra la independencia de Colombia?", "20 de julio", ["7 de agosto", "12 de octubre", "25 de diciembre"]], ["¿Quién fue Cleopatra?", "Una reina de Egipto", ["Una emperatriz romana", "Una diosa griega", "Una reina de Persia"]], ["¿En qué guerra se lanzaron las bombas atómicas sobre Japón?", "Segunda Guerra Mundial", ["Primera Guerra Mundial", "Guerra Fría", "Guerra de Corea"]], ["¿Qué ciudad europea fue dividida por un muro durante la Guerra Fría?", "Berlín", ["París", "Viena", "Varsovia"]], ["¿Quién fue el primer ser humano en viajar al espacio?", "Yuri Gagarin", ["Neil Armstrong", "Buzz Aldrin", "John Glenn"]], ["¿Cómo se llamaban los tres barcos del primer viaje de Colón?", "La Niña, la Pinta y la Santa María", ["La Victoria, la Trinidad y la Concepción", "El Mayflower, el Endeavour y el Beagle", "La Esperanza, la Fe y la Caridad"]], ["¿Qué pueblo antiguo construyó el Partenón?", "Los griegos", ["Los romanos", "Los egipcios", "Los persas"]], ["¿Qué invento de Gutenberg permitió imprimir muchos libros?", "La imprenta", ["El telégrafo", "La máquina de escribir", "El papel"]], ["¿De qué país fue emperador Napoleón Bonaparte?", "Francia", ["Italia", "España", "Austria"]], ["¿Qué día se conmemora la Batalla de Boyacá en Colombia?", "7 de agosto", ["20 de julio", "12 de octubre", "11 de noviembre"]], ["¿En qué país gobernaban los faraones?", "Egipto", ["Grecia", "Persia", "India"]], ["¿Cómo se llamaban los guerreros nórdicos que navegaban en barcos de madera?", "Vikingos", ["Samuráis", "Espartanos", "Mongoles"]], ["¿Qué guerreros japoneses seguían el código del bushido?", "Samuráis", ["Vikingos", "Gladiadores", "Mosqueteros"]], ["¿En qué país nació Simón Bolívar?", "Venezuela", ["Colombia", "Ecuador", "Perú"]], ["¿Quién fue Martin Luther King?", "Un líder de los derechos civiles en Estados Unidos", ["Un presidente de Estados Unidos", "Un reformador religioso alemán", "Un científico británico"]], ["¿Qué famoso barco se hundió en 1912 tras chocar con un iceberg?", "Titanic", ["Lusitania", "Britannic", "Queen Mary"]], ["¿Qué imperio tenía su capital en Tenochtitlan?", "El azteca", ["El inca", "El maya", "El romano"]], ["¿Quiénes luchaban en el Coliseo romano para entretener al público?", "Los gladiadores", ["Los samuráis", "Los vikingos", "Los templarios"]], ["¿Qué líder de la India promovió la independencia de su país con la no violencia?", "Mahatma Gandhi", ["Nelson Mandela", "Jawaharlal Nehru", "El dalái lama"]], ["¿Quién fue el primer presidente negro de Sudáfrica?", "Nelson Mandela", ["Desmond Tutu", "Jacob Zuma", "Kofi Annan"]], ["¿Con qué invento se asocia más a Thomas Edison?", "La bombilla eléctrica", ["El teléfono", "La radio", "El avión"]], ["¿Quiénes realizaron el primer vuelo en avión con motor en 1903?", "Los hermanos Wright", ["Los hermanos Lumière", "Los hermanos Grimm", "Los hermanos Montgolfier"]], ["¿En qué continente surgieron los primeros seres humanos?", "África", ["Asia", "Europa", "América"]], ["¿Qué instrumento usaban los navegantes para orientarse hacia el norte?", "La brújula", ["El telescopio", "El reloj de arena", "El barómetro"]], ["¿Cómo se llama la época anterior a la invención de la escritura?", "Prehistoria", ["Edad Media", "Edad Moderna", "Antigüedad clásica"]], ["¿Qué periodo histórico es famoso por los castillos, los reyes y los caballeros?", "La Edad Media", ["La Prehistoria", "La Edad Contemporánea", "La Revolución industrial"]], ["¿Qué país colonizó el territorio que hoy es Colombia?", "España", ["Portugal", "Inglaterra", "Francia"]], ["¿Quién fue la primera mujer en ganar un Premio Nobel?", "Marie Curie", ["Madre Teresa", "Rosalind Franklin", "Ada Lovelace"]]], "Media": [["¿Quién lideró la campaña libertadora de 1819 que terminó en la Batalla de Boyacá?", "Simón Bolívar", ["José de San Martín", "Antonio Nariño", "Francisco de Paula Santander"]], ["¿En qué año fue el Grito de Independencia en Bogotá?", "1810", ["1819", "1821", "1830"]], ["¿En qué año se firmó la Declaración de Independencia de Estados Unidos?", "1776", ["1789", "1783", "1812"]], ["¿En qué año comenzó la Primera Guerra Mundial?", "1914", ["1905", "1918", "1939"]], ["¿Quién fue el líder de la Alemania nazi?", "Adolf Hitler", ["Benito Mussolini", "Francisco Franco", "Joseph Stalin"]], ["¿En qué año terminó la Segunda Guerra Mundial?", "1945", ["1939", "1943", "1950"]], ["Julio César fue un gran general y político de…", "Roma", ["Grecia", "Egipto", "Persia"]], ["¿Qué conquistador español derrotó al Imperio inca?", "Francisco Pizarro", ["Hernán Cortés", "Pedro de Valdivia", "Gonzalo Jiménez de Quesada"]], ["¿Quién fundó Bogotá en 1538?", "Gonzalo Jiménez de Quesada", ["Sebastián de Belalcázar", "Pedro de Heredia", "Rodrigo de Bastidas"]], ["¿Qué hecho histórico comenzó en 1789 en Francia?", "La Revolución francesa", ["La Revolución industrial", "La Revolución rusa", "La Guerra de los Cien Años"]], ["¿Quién fue presidente de Estados Unidos durante la Guerra Civil?", "Abraham Lincoln", ["George Washington", "Theodore Roosevelt", "Ulysses Grant"]], ["¿En qué año cayó el Muro de Berlín?", "1989", ["1985", "1991", "1993"]], ["¿Qué nombre recibió el territorio colombiano cuando los españoles lo conquistaron en el siglo XVI?", "Nuevo Reino de Granada", ["Virreinato del Perú", "Capitanía de Venezuela", "Gran Colombia"]], ["¿Cómo se llamó la república que unió a Colombia, Venezuela, Ecuador y Panamá entre 1819 y 1831?", "La Gran Colombia", ["Provincias Unidas", "Confederación Granadina", "Estados Unidos de Colombia"]], ["¿En qué año se separó Panamá de Colombia?", "1903", ["1886", "1910", "1899"]], ["¿Qué imperio fue fundado por Gengis Kan?", "El mongol", ["El otomano", "El persa", "El chino"]], ["¿Qué reina española apoyó el viaje de Cristóbal Colón?", "Isabel la Católica", ["Isabel I de Inglaterra", "Juana la Loca", "María Antonieta"]], ["¿Qué ciudad romana quedó sepultada por la erupción del Vesubio en el año 79?", "Pompeya", ["Roma", "Atenas", "Cartago"]], ["¿En qué año ocurrió el ataque a las Torres Gemelas de Nueva York?", "2001", ["1999", "2003", "2005"]], ["¿Qué país lanzó el Sputnik, el primer satélite artificial?", "La Unión Soviética", ["Estados Unidos", "China", "Alemania"]], ["¿Qué prócer colombiano es conocido como “el Hombre de las Leyes”?", "Francisco de Paula Santander", ["Antonio Nariño", "Camilo Torres", "Simón Bolívar"]], ["¿Quién tradujo y publicó en la Nueva Granada los Derechos del Hombre y del Ciudadano?", "Antonio Nariño", ["Camilo Torres", "Francisco de Paula Santander", "Policarpa Salavarrieta"]], ["¿Qué heroína de la independencia colombiana fue fusilada en Bogotá en 1817?", "Policarpa Salavarrieta", ["Manuela Beltrán", "Antonia Santos", "Manuela Sáenz"]], ["¿Qué civilización construyó la ciudad de Chichén Itzá?", "Los mayas", ["Los incas", "Los muiscas", "Los taínos"]], ["¿Qué pueblo indígena habitaba el altiplano cundiboyacense cuando llegaron los españoles?", "Los muiscas", ["Los taironas", "Los zenúes", "Los wayuu"]], ["¿Qué leyenda habla de un cacique cubierto de oro en la laguna de Guatavita?", "El Dorado", ["La Llorona", "El Mohán", "La Madremonte"]], ["¿En qué año se disolvió la Unión Soviética?", "1991", ["1989", "1985", "1995"]], ["¿Quién fue el primer emperador de Roma?", "Augusto", ["Julio César", "Nerón", "Constantino"]], ["¿Qué país atacó la base de Pearl Harbor en 1941?", "Japón", ["Alemania", "Italia", "Unión Soviética"]], ["¿Qué inventor perfeccionó la máquina de vapor que impulsó la Revolución industrial?", "James Watt", ["Thomas Edison", "Nikola Tesla", "Henry Ford"]], ["¿En qué país comenzó la Revolución industrial?", "Gran Bretaña", ["Francia", "Alemania", "Estados Unidos"]], ["¿Qué muro construyeron los romanos en el norte de Britania?", "Muro de Adriano", ["Muro de Berlín", "Gran Muralla", "Muro de los Lamentos"]], ["¿Cómo se llamaba la antigua ruta comercial que unía China con Europa?", "La Ruta de la Seda", ["El Camino de Santiago", "El Camino Real", "La Ruta 66"]], ["¿Qué líder encabezó la Revolución cubana que triunfó en 1959?", "Fidel Castro", ["Fulgencio Batista", "José Martí", "Hugo Chávez"]], ["¿Quién escribió el “Manifiesto comunista” junto a Friedrich Engels?", "Karl Marx", ["Vladimir Lenin", "Adam Smith", "Iósif Stalin"]], ["¿En qué año llegó el ser humano a la Luna por primera vez?", "1969", ["1965", "1972", "1959"]]], "Difícil": [["¿Qué presidente gobernaba Colombia cuando se expidió la Constitución de 1991?", "César Gaviria", ["Virgilio Barco", "Ernesto Samper", "Andrés Pastrana"]], ["¿Qué filósofo griego fue maestro de Alejandro Magno?", "Aristóteles", ["Platón", "Sócrates", "Pitágoras"]], ["¿Qué pueblo de la antigüedad desarrolló la escritura cuneiforme?", "Los sumerios", ["Los egipcios", "Los fenicios", "Los griegos"]], ["¿En qué año cayó Constantinopla en manos de los otomanos?", "1453", ["1492", "1204", "1517"]], ["¿Qué tratado puso fin a la Primera Guerra Mundial con Alemania?", "Tratado de Versalles", ["Tratado de Tordesillas", "Tratado de Utrecht", "Tratado de París"]], ["¿Qué batalla de 1819 selló la independencia de Colombia?", "Batalla de Boyacá", ["Batalla de Carabobo", "Batalla de Ayacucho", "Batalla de Pichincha"]], ["¿Quién lideró la Revolución rusa de 1917?", "Vladimir Lenin", ["Iósif Stalin", "León Trotski", "Nicolás II"]], ["¿En qué año fue asesinado Jorge Eliécer Gaitán, hecho conocido como el Bogotazo?", "1948", ["1938", "1953", "1958"]], ["¿Quién fue derrotado en la Batalla de Waterloo en 1815?", "Napoleón Bonaparte", ["Julio César", "Aníbal", "Atila"]], ["¿Quién fue el primer europeo en llegar a la India por mar bordeando África?", "Vasco da Gama", ["Fernando de Magallanes", "Bartolomé Díaz", "Américo Vespucio"]], ["¿Qué país gobernó Francisco Franco entre 1939 y 1975?", "España", ["Italia", "Portugal", "Argentina"]], ["¿Qué hecho desencadenó la Primera Guerra Mundial?", "El asesinato del archiduque Francisco Fernando", ["El hundimiento del Lusitania", "La invasión de Polonia", "El ataque a Pearl Harbor"]], ["¿Qué rey francés fue guillotinado en 1793?", "Luis XVI", ["Luis XIV", "Luis XV", "Carlos X"]], ["¿En qué año se expidió la Constitución de Rionegro en Colombia?", "1863", ["1853", "1886", "1843"]], ["¿Qué guerra civil colombiana terminó en 1902 con los tratados de Neerlandia y Wisconsin?", "La Guerra de los Mil Días", ["La Guerra de los Supremos", "La Violencia", "La Guerra de las Escuelas"]], ["¿Qué emperador inca fue capturado por Francisco Pizarro en Cajamarca?", "Atahualpa", ["Huáscar", "Manco Cápac", "Pachacútec"]], ["¿Qué emperador azteca gobernaba cuando llegó Hernán Cortés?", "Moctezuma II", ["Cuauhtémoc", "Cuitláhuac", "Netzahualcóyotl"]], ["¿Qué batalla naval de 1571 enfrentó a la Liga Santa contra el Imperio otomano?", "Batalla de Lepanto", ["Batalla de Trafalgar", "Batalla de Salamina", "Batalla de Actium"]], ["¿En qué año se firmó la Carta Magna en Inglaterra?", "1215", ["1066", "1348", "1492"]], ["¿Qué dinastía china construyó la mayor parte de la Gran Muralla que se conserva hoy?", "Ming", ["Qin", "Han", "Tang"]], ["¿Qué general cartaginés cruzó los Alpes con elefantes?", "Aníbal", ["Escipión", "Amílcar", "Asdrúbal"]], ["¿En qué año se firmó el acuerdo de paz entre el Gobierno colombiano y las FARC?", "2016", ["2012", "2014", "2018"]], ["¿Qué presidente colombiano recibió el Premio Nobel de la Paz?", "Juan Manuel Santos", ["Álvaro Uribe", "Andrés Pastrana", "Belisario Betancur"]], ["¿Qué tratado de 1494 repartió las nuevas tierras entre España y Portugal?", "Tratado de Tordesillas", ["Tratado de Versalles", "Tratado de Utrecht", "Tratado de Zaragoza"]], ["¿Qué científico fue juzgado por la Inquisición en 1633 por defender que la Tierra gira alrededor del Sol?", "Galileo Galilei", ["Nicolás Copérnico", "Giordano Bruno", "Johannes Kepler"]], ["¿Qué imperio gobernó Solimán el Magnífico?", "El otomano", ["El persa", "El mongol", "El bizantino"]], ["¿Quién fue el último zar de Rusia?", "Nicolás II", ["Alejandro III", "Pedro el Grande", "Iván el Terrible"]], ["¿Qué expedición dio la primera vuelta al mundo, completada por Juan Sebastián Elcano?", "La expedición de Magallanes", ["La expedición de Colón", "La expedición de James Cook", "La expedición de Vasco da Gama"]], ["¿En qué año comenzó la Segunda Guerra Mundial?", "1939", ["1937", "1941", "1914"]], ["¿Qué reina gobernó el Reino Unido durante más de 70 años, hasta 2022?", "Isabel II", ["Victoria", "Ana", "María I"]], ["¿Qué sabio dirigió la Real Expedición Botánica en la Nueva Granada?", "José Celestino Mutis", ["Francisco José de Caldas", "Alexander von Humboldt", "Jorge Tadeo Lozano"]], ["¿Qué levantamiento de 1781, iniciado en El Socorro, protestó contra los impuestos españoles?", "La Revolución de los Comuneros", ["El Grito de Independencia", "La Patria Boba", "El Bogotazo"]], ["¿Cómo se conoce el periodo de 1810 a 1816 de luchas entre centralistas y federalistas en la Nueva Granada?", "La Patria Boba", ["La Violencia", "El Frente Nacional", "La Regeneración"]], ["¿Qué acuerdo alternó el poder entre liberales y conservadores en Colombia entre 1958 y 1974?", "El Frente Nacional", ["La Regeneración", "La Unión Patriótica", "La Patria Boba"]], ["¿Qué rey de Babilonia es famoso por su código de leyes?", "Hammurabi", ["Nabucodonosor II", "Darío I", "Ciro el Grande"]], ["¿Qué pueblo de la antigüedad fundó la ciudad de Cartago?", "Los fenicios", ["Los romanos", "Los griegos", "Los egipcios"]]]}, "Ciencia": {"Fácil": [["¿Qué planeta es conocido como el planeta rojo?", "Marte", ["Venus", "Júpiter", "Saturno"]], ["¿Qué gas necesitamos respirar para vivir?", "Oxígeno", ["Nitrógeno", "Hidrógeno", "Helio"]], ["¿Cuál es el satélite natural de la Tierra?", "La Luna", ["Fobos", "Titán", "Europa"]], ["¿Cuál es el único mamífero capaz de volar?", "Murciélago", ["Águila", "Colibrí", "Gaviota"]], ["¿Cuántas patas tiene una araña?", "8", ["6", "10", "4"]], ["¿Cómo se llama el agua en estado sólido?", "Hielo", ["Vapor", "Nube", "Rocío"]], ["¿Qué órgano bombea la sangre por el cuerpo?", "Corazón", ["Pulmón", "Hígado", "Riñón"]], ["¿Qué insecto produce la miel?", "Abeja", ["Mariposa", "Hormiga", "Mosca"]], ["¿Cuál es el planeta más cercano al Sol?", "Mercurio", ["Venus", "Tierra", "Marte"]], ["¿Qué hueso protege el cerebro?", "Cráneo", ["Costilla", "Fémur", "Columna"]], ["¿Cuál es el animal más grande del mundo?", "Ballena azul", ["Elefante africano", "Jirafa", "Tiburón blanco"]], ["¿Cuántos colores tiene tradicionalmente el arcoíris?", "7", ["5", "6", "9"]], ["¿Qué parte de la planta absorbe el agua del suelo?", "La raíz", ["La flor", "La hoja", "El fruto"]], ["¿Cuál es la estrella más cercana a la Tierra?", "El Sol", ["Sirio", "La estrella Polar", "Alfa Centauri"]], ["¿Cómo se llama el agua en estado gaseoso?", "Vapor", ["Hielo", "Granizo", "Escarcha"]], ["¿A qué temperatura hierve el agua al nivel del mar?", "100 °C", ["50 °C", "0 °C", "200 °C"]], ["¿A qué temperatura se congela el agua?", "0 °C", ["10 °C", "-10 °C", "32 °C"]], ["¿Qué órganos usamos para respirar?", "Los pulmones", ["El estómago", "El hígado", "Los riñones"]], ["¿Cuál de estos animales es un mamífero que vive en el mar?", "Delfín", ["Tiburón", "Pulpo", "Atún"]], ["¿Cuántos sentidos tiene tradicionalmente el ser humano?", "5", ["4", "6", "7"]], ["¿Con qué órganos vemos?", "Los ojos", ["Los oídos", "La nariz", "La lengua"]], ["¿Cuál de estos animales pone huevos y tiene plumas?", "Gallina", ["Perro", "Vaca", "Murciélago"]], ["¿Cómo se llama la fuerza que hace caer los objetos al suelo?", "Gravedad", ["Magnetismo", "Fricción", "Electricidad"]], ["¿Qué planeta tiene unos anillos muy visibles?", "Saturno", ["Marte", "Mercurio", "Venus"]], ["¿De qué se alimentan los animales herbívoros?", "De plantas", ["De carne", "De insectos", "De peces"]], ["¿En qué insecto se convierte una oruga?", "Mariposa", ["Abeja", "Libélula", "Escarabajo"]], ["¿Cuántos dientes tiene la dentadura completa de un adulto?", "32", ["28", "20", "36"]], ["¿Qué gas expulsamos al respirar?", "Dióxido de carbono", ["Oxígeno", "Helio", "Hidrógeno"]], ["¿Qué tipo de animal es la rana?", "Anfibio", ["Reptil", "Mamífero", "Pez"]], ["¿Qué animal tiene el cuello más largo?", "Jirafa", ["Avestruz", "Camello", "Caballo"]], ["¿Qué instrumento se usa para ver objetos muy pequeños?", "Microscopio", ["Telescopio", "Periscopio", "Termómetro"]], ["¿Qué instrumento mide la temperatura?", "Termómetro", ["Barómetro", "Balanza", "Regla"]], ["¿Qué produce el día y la noche?", "La rotación de la Tierra", ["La traslación de la Tierra", "Las fases de la Luna", "Los eclipses"]], ["¿Cuánto tarda la Tierra en dar una vuelta completa alrededor del Sol?", "Un año", ["Un mes", "Un día", "Diez años"]], ["¿Cuál es el animal terrestre más rápido?", "Guepardo", ["León", "Caballo", "Gacela"]], ["¿De qué color es la clorofila de las plantas?", "Verde", ["Roja", "Azul", "Amarilla"]]], "Media": [["¿Qué elemento químico tiene el símbolo “O”?", "Oxígeno", ["Oro", "Osmio", "Ozono"]], ["¿Cuántos huesos tiene aproximadamente un adulto?", "206", ["106", "306", "406"]], ["¿Cuál es el símbolo químico del oro?", "Au", ["Ag", "Or", "Go"]], ["¿Qué metal es líquido a temperatura ambiente?", "Mercurio", ["Plomo", "Hierro", "Cobre"]], ["¿Cómo se llama el proceso por el que las plantas producen su alimento con la luz?", "Fotosíntesis", ["Respiración", "Digestión", "Fermentación"]], ["¿Cuál es el planeta más grande del sistema solar?", "Júpiter", ["Saturno", "Neptuno", "Tierra"]], ["¿Qué vitamina se produce en la piel con la luz del sol?", "Vitamina D", ["Vitamina A", "Vitamina C", "Vitamina B12"]], ["¿Qué orgánulo celular se conoce como la central energética de la célula?", "Mitocondria", ["Núcleo", "Ribosoma", "Lisosoma"]], ["¿Quién formuló la teoría de la relatividad?", "Albert Einstein", ["Isaac Newton", "Galileo Galilei", "Nikola Tesla"]], ["¿Cuál es el tercer planeta desde el Sol?", "Tierra", ["Venus", "Marte", "Mercurio"]], ["¿Cuántos grados mide un ángulo recto?", "90", ["45", "100", "180"]], ["¿Qué gas absorben las plantas del aire para hacer la fotosíntesis?", "Dióxido de carbono", ["Oxígeno", "Nitrógeno", "Hidrógeno"]], ["¿Cuál es el símbolo químico de la plata?", "Ag", ["Au", "Pl", "Pt"]], ["¿Cuál es el símbolo químico del hierro?", "Fe", ["Hi", "Ir", "F"]], ["¿Cuál es la fórmula química del agua?", "H2O", ["CO2", "O2", "NaCl"]], ["¿Cuál es el planeta más lejano del Sol?", "Neptuno", ["Plutón", "Urano", "Saturno"]], ["¿Qué tipo de sangre se considera donante universal?", "O negativo", ["AB positivo", "A positivo", "B negativo"]], ["¿Qué órgano produce la insulina?", "Páncreas", ["Hígado", "Riñón", "Estómago"]], ["¿En qué parte de la célula se guarda principalmente el ADN?", "El núcleo", ["La membrana", "El citoplasma", "La pared celular"]], ["¿Cómo se llaman los animales que comen plantas y carne?", "Omnívoros", ["Herbívoros", "Carnívoros", "Insectívoros"]], ["¿Qué científico propuso la teoría de la evolución por selección natural?", "Charles Darwin", ["Gregor Mendel", "Louis Pasteur", "Isaac Newton"]], ["¿Quién formuló la ley de la gravitación universal?", "Isaac Newton", ["Albert Einstein", "Galileo Galilei", "Johannes Kepler"]], ["¿En qué unidad se mide la corriente eléctrica?", "Amperio", ["Voltio", "Ohmio", "Vatio"]], ["¿Qué capa de la atmósfera nos protege de los rayos ultravioleta?", "La capa de ozono", ["La ionosfera", "La exosfera", "La mesosfera"]], ["¿Cuántos planetas tiene el sistema solar?", "8", ["9", "7", "10"]], ["¿Qué científico estudió la herencia con plantas de guisantes?", "Gregor Mendel", ["Charles Darwin", "Louis Pasteur", "James Watson"]], ["¿Qué científico creó la pasteurización?", "Louis Pasteur", ["Alexander Fleming", "Robert Koch", "Edward Jenner"]], ["¿Cuál es el pH del agua pura?", "7", ["0", "5", "14"]], ["¿Qué tipo de animal es la ballena?", "Mamífero", ["Pez", "Reptil", "Anfibio"]], ["¿Cómo se llama el paso del agua de líquido a gas?", "Evaporación", ["Condensación", "Solidificación", "Fusión"]], ["¿Qué órganos filtran la sangre y producen la orina?", "Los riñones", ["El hígado", "Los pulmones", "El páncreas"]], ["¿Qué metal es el más usado en los cables eléctricos de las casas?", "Cobre", ["Oro", "Hierro", "Plomo"]], ["¿Cuál es el planeta más caliente del sistema solar?", "Venus", ["Mercurio", "Marte", "Júpiter"]], ["¿Cómo se llaman las células que no tienen un núcleo definido?", "Procariotas", ["Eucariotas", "Animales", "Vegetales"]], ["¿Cuál es la velocidad aproximada del sonido en el aire?", "343 m/s", ["34 m/s", "3.430 m/s", "300.000 km/s"]], ["¿Qué parte del ojo le da su color?", "El iris", ["La pupila", "La retina", "La córnea"]]], "Difícil": [["¿Cuál es el número atómico del carbono?", "6", ["4", "8", "12"]], ["¿Cuál es el hueso más largo del cuerpo humano?", "Fémur", ["Tibia", "Húmero", "Peroné"]], ["¿Cuál es el elemento más abundante del universo?", "Hidrógeno", ["Helio", "Oxígeno", "Carbono"]], ["¿Cuál es la fórmula química de la sal común?", "NaCl", ["KCl", "NaOH", "CaCO3"]], ["¿Qué científico descubrió la penicilina?", "Alexander Fleming", ["Louis Pasteur", "Marie Curie", "Robert Koch"]], ["¿Cuál es la unidad de fuerza en el Sistema Internacional?", "Newton", ["Joule", "Pascal", "Watt"]], ["¿Cuál es el símbolo químico del sodio?", "Na", ["S", "So", "Sd"]], ["¿Qué gas forma la mayor parte de la atmósfera terrestre?", "Nitrógeno", ["Oxígeno", "Dióxido de carbono", "Argón"]], ["¿Cuántos cromosomas tiene una célula humana normal?", "46", ["23", "44", "48"]], ["¿Cuál es el órgano más grande del cuerpo humano?", "Piel", ["Hígado", "Intestino delgado", "Pulmón"]], ["¿Cuál es la velocidad aproximada de la luz en el vacío?", "300.000 km/s", ["150.000 km/s", "30.000 km/s", "3.000.000 km/s"]], ["¿Cómo se llama la galaxia en la que está la Tierra?", "Vía Láctea", ["Andrómeda", "Triángulo", "Sombrero"]], ["¿Cuántos corazones tiene un pulpo?", "3", ["1", "2", "4"]], ["¿Cuál es el símbolo químico del potasio?", "K", ["P", "Po", "Pt"]], ["¿Cuál es el gas noble más ligero?", "Helio", ["Neón", "Argón", "Kriptón"]], ["¿Qué partícula del átomo tiene carga negativa?", "Electrón", ["Protón", "Neutrón", "Positrón"]], ["¿Qué científico propuso en 1913 el modelo atómico con órbitas definidas?", "Niels Bohr", ["Ernest Rutherford", "John Dalton", "J. J. Thomson"]], ["¿Cuál es el metal más abundante en la corteza terrestre?", "Aluminio", ["Hierro", "Cobre", "Oro"]], ["¿Qué tipo de enlace une los átomos de la sal común (NaCl)?", "Iónico", ["Covalente", "Metálico", "Puente de hidrógeno"]], ["¿En qué unidad se mide la resistencia eléctrica?", "Ohmio", ["Voltio", "Amperio", "Faradio"]], ["¿Cómo se llama la teoría que explica el origen del universo a partir de una gran expansión?", "Big Bang", ["Estado estacionario", "Deriva continental", "Panspermia"]], ["¿Qué científico propuso la teoría de la deriva continental?", "Alfred Wegener", ["Charles Lyell", "James Hutton", "Charles Darwin"]], ["¿Cuál es el hueso más pequeño del cuerpo humano?", "El estribo", ["El yunque", "El martillo", "La falange"]], ["¿Qué proteína de la sangre transporta el oxígeno?", "Hemoglobina", ["Insulina", "Queratina", "Colágeno"]], ["¿Qué planeta tiene más lunas confirmadas?", "Saturno", ["Júpiter", "Urano", "Neptuno"]], ["¿Qué científicos describieron en 1953 la estructura en doble hélice del ADN?", "Watson y Crick", ["Darwin y Wallace", "Curie y Becquerel", "Mendel y Morgan"]], ["¿Cuál es el número atómico del oxígeno?", "8", ["6", "16", "10"]], ["¿Qué tipo de roca se forma cuando se enfría el magma?", "Ígnea", ["Sedimentaria", "Metamórfica", "Caliza"]], ["¿A cuántos grados Celsius equivale el cero absoluto?", "-273,15 °C", ["-100 °C", "-459,67 °C", "0 °C"]], ["¿Qué ley dice que a toda acción corresponde una reacción igual y opuesta?", "Tercera ley de Newton", ["Primera ley de Newton", "Segunda ley de Newton", "Ley de Ohm"]], ["¿Qué vitamina es fundamental para la coagulación de la sangre?", "Vitamina K", ["Vitamina C", "Vitamina D", "Vitamina A"]], ["¿Cuál es el elemento químico más abundante en la corteza terrestre?", "Oxígeno", ["Silicio", "Hierro", "Aluminio"]], ["¿Cuál es la estrella más brillante del cielo nocturno?", "Sirio", ["La estrella Polar", "Betelgeuse", "Vega"]], ["¿Qué órgano produce la bilis?", "Hígado", ["Vesícula biliar", "Páncreas", "Estómago"]], ["¿Qué científica británica obtuvo la famosa “Fotografía 51” del ADN?", "Rosalind Franklin", ["Marie Curie", "Ada Lovelace", "Dorothy Hodgkin"]], ["¿Cuál es la capa más externa de la Tierra?", "La corteza", ["El manto", "El núcleo externo", "El núcleo interno"]]]}, "Arte y Literatura": {"Fácil": [["¿Qué instrumento tiene teclas blancas y negras?", "Piano", ["Guitarra", "Violín", "Flauta"]], ["¿Quién escribió las novelas de Harry Potter?", "J. K. Rowling", ["Roald Dahl", "J. R. R. Tolkien", "C. S. Lewis"]], ["¿Cuántas cuerdas tiene una guitarra estándar?", "6", ["4", "5", "8"]], ["¿Qué color resulta de mezclar azul y amarillo?", "Verde", ["Morado", "Naranja", "Marrón"]], ["¿Quién pintó la Mona Lisa?", "Leonardo da Vinci", ["Miguel Ángel", "Rafael", "Fernando Botero"]], ["¿Quién escribió “Cien años de soledad”?", "Gabriel García Márquez", ["Mario Vargas Llosa", "Julio Cortázar", "Jorge Isaacs"]], ["¿Qué instrumento de cuerda se toca con arco y se apoya en el hombro?", "Violín", ["Guitarra", "Arpa", "Piano"]], ["¿Qué personaje de cuento perdió un zapato de cristal?", "Cenicienta", ["Blancanieves", "La Bella Durmiente", "Rapunzel"]], ["¿Quién escribió “Romeo y Julieta”?", "William Shakespeare", ["Miguel de Cervantes", "Charles Dickens", "Víctor Hugo"]], ["¿De qué país es originario el flamenco?", "España", ["México", "Portugal", "Argentina"]], ["¿Cuántas notas tiene la escala musical básica (do, re, mi…)?", "7", ["5", "8", "12"]], ["¿Cuáles son los tres colores primarios en la pintura tradicional?", "Rojo, amarillo y azul", ["Verde, naranja y morado", "Blanco, negro y gris", "Rojo, verde y negro"]], ["¿Qué instrumento de viento metálico tiene pistones y se usa en las bandas?", "Trompeta", ["Violín", "Piano", "Tambor"]], ["¿Cuántos músicos forman un dúo?", "2", ["3", "4", "1"]], ["¿Qué color resulta de mezclar rojo y amarillo?", "Naranja", ["Verde", "Morado", "Café"]], ["¿Qué color resulta de mezclar rojo y azul?", "Morado", ["Verde", "Naranja", "Amarillo"]], ["¿Qué personaje de cuento es una niña de capa roja que visita a su abuela?", "Caperucita Roja", ["Ricitos de Oro", "Alicia", "Blancanieves"]], ["¿A qué personaje de madera le crecía la nariz cuando mentía?", "Pinocho", ["Peter Pan", "Geppetto", "Pepito Grillo"]], ["¿Qué personaje es el niño que nunca crece?", "Peter Pan", ["Pinocho", "Oliver Twist", "Tom Sawyer"]], ["¿Qué instrumento de percusión se toca con baquetas y tiene tambores y platillos?", "La batería", ["El violín", "La flauta", "El arpa"]], ["¿En qué objeto mezcla un pintor sus colores?", "La paleta", ["El cincel", "El martillo", "La regla"]], ["¿Qué herramienta usa un escultor para tallar la piedra?", "El cincel", ["El pincel", "La pluma", "El lápiz"]], ["¿Qué cantante colombiana interpreta “Hips Don't Lie”?", "Shakira", ["Karol G", "Fanny Lu", "Totó la Momposina"]], ["¿De qué país es la música de mariachi?", "México", ["España", "Colombia", "Argentina"]], ["¿Cómo se llama el arte de representar una historia actuada sobre un escenario?", "Teatro", ["Novela", "Poesía", "Ensayo"]], ["¿Qué nombre recibe un texto escrito en versos?", "Poema", ["Novela", "Noticia", "Receta"]], ["¿Qué instrumento de viento se usa a menudo para aprender música en el colegio?", "Flauta dulce", ["Tuba", "Fagot", "Corno"]], ["¿Qué princesa de cuento duerme por un hechizo hasta recibir un beso?", "La Bella Durmiente", ["Cenicienta", "Caperucita Roja", "Rapunzel"]], ["¿Qué personaje de cuento tiene un cabello larguísimo y vive encerrada en una torre?", "Rapunzel", ["Blancanieves", "Cenicienta", "Bella"]], ["¿Cómo se llama la persona que dirige una orquesta?", "Director", ["Solista", "Tenor", "Afinador"]], ["¿Qué es un autorretrato?", "Una obra en la que el artista se representa a sí mismo", ["Un paisaje", "Un dibujo animado", "Una escultura de un animal"]], ["¿Qué carnaval colombiano se celebra en la costa Caribe antes del Miércoles de Ceniza?", "Carnaval de Barranquilla", ["Feria de las Flores", "Feria de Cali", "Festival de la Leyenda Vallenata"]], ["¿Qué género musical colombiano se toca con acordeón, caja y guacharaca?", "Vallenato", ["Tango", "Salsa", "Merengue"]], ["¿Qué animal persigue a los protagonistas del cuento “Los tres cerditos”?", "El lobo", ["El zorro", "El oso", "El león"]], ["¿Qué escritor colombiano es conocido como “Gabo”?", "Gabriel García Márquez", ["Álvaro Mutis", "Fernando Vallejo", "Héctor Abad Faciolince"]], ["¿Qué arte usa el cuerpo y el movimiento al ritmo de la música?", "La danza", ["La escultura", "La pintura", "La arquitectura"]]], "Media": [["¿Quién creó al personaje Don Quijote de la Mancha?", "Miguel de Cervantes", ["Lope de Vega", "Federico García Lorca", "Gustavo Adolfo Bécquer"]], ["¿Qué pintor creó “La noche estrellada”?", "Vincent van Gogh", ["Claude Monet", "Pablo Picasso", "Salvador Dalí"]], ["¿Qué compositor escribió la Novena Sinfonía con el “Himno a la Alegría”?", "Ludwig van Beethoven", ["Wolfgang Amadeus Mozart", "Johann Sebastian Bach", "Franz Schubert"]], ["¿En qué país nació el tango?", "Argentina", ["Brasil", "México", "Cuba"]], ["¿Quién pintó “Guernica”?", "Pablo Picasso", ["Salvador Dalí", "Joan Miró", "Diego Velázquez"]], ["¿Qué pintor colombiano es famoso por sus figuras voluminosas?", "Fernando Botero", ["Alejandro Obregón", "Débora Arango", "Édgar Negret"]], ["¿Quién pintó “Las Meninas”?", "Diego Velázquez", ["Francisco de Goya", "El Greco", "Bartolomé Murillo"]], ["¿Qué género musical nació en Jamaica?", "Reggae", ["Salsa", "Tango", "Jazz"]], ["¿En qué ciudad nació el jazz?", "Nueva Orleans", ["Chicago", "Nueva York", "Memphis"]], ["¿Qué cantante colombiano interpreta “La camisa negra”?", "Juanes", ["Carlos Vives", "Maluma", "J Balvin"]], ["¿Qué escritor creó a Sherlock Holmes?", "Arthur Conan Doyle", ["Agatha Christie", "Edgar Allan Poe", "Charles Dickens"]], ["¿Qué ritmo es originario de Colombia?", "La cumbia", ["El tango", "El flamenco", "El reggae"]], ["¿Quién escribió “María”, la novela romántica colombiana?", "Jorge Isaacs", ["José Eustasio Rivera", "Tomás Carrasquilla", "Rafael Pombo"]], ["¿Qué poeta colombiano escribió “Rin Rin Renacuajo”?", "Rafael Pombo", ["José Asunción Silva", "Jorge Isaacs", "León de Greiff"]], ["¿Quién escribió “Las aventuras de Pinocho”?", "Carlo Collodi", ["Hans Christian Andersen", "Charles Perrault", "Los hermanos Grimm"]], ["¿Quién escribió el cuento “El patito feo”?", "Hans Christian Andersen", ["Charles Perrault", "Carlo Collodi", "Los hermanos Grimm"]], ["¿Quién escribió “Alicia en el país de las maravillas”?", "Lewis Carroll", ["J. M. Barrie", "Roald Dahl", "Mark Twain"]], ["¿Quién escribió “Las aventuras de Tom Sawyer”?", "Mark Twain", ["Charles Dickens", "Jack London", "Herman Melville"]], ["¿Qué escritor inglés escribió “Oliver Twist”?", "Charles Dickens", ["Jane Austen", "Oscar Wilde", "Lewis Carroll"]], ["¿Quién escribió “Moby Dick”?", "Herman Melville", ["Jack London", "Ernest Hemingway", "Mark Twain"]], ["¿Qué pintor impresionista francés es famoso por sus cuadros de nenúfares?", "Claude Monet", ["Pierre-Auguste Renoir", "Edgar Degas", "Paul Cézanne"]], ["¿Qué escultor creó “El pensador”?", "Auguste Rodin", ["Miguel Ángel", "Gian Lorenzo Bernini", "Donatello"]], ["¿Quién esculpió el famoso “David” de mármol que está en Florencia?", "Miguel Ángel", ["Donatello", "Gian Lorenzo Bernini", "Auguste Rodin"]], ["¿Qué pintora mexicana es famosa por sus autorretratos?", "Frida Kahlo", ["Remedios Varo", "Tamara de Lempicka", "Débora Arango"]], ["¿Qué muralista mexicano fue esposo de Frida Kahlo?", "Diego Rivera", ["José Clemente Orozco", "David Alfaro Siqueiros", "Rufino Tamayo"]], ["¿Qué compositor polaco es famoso por sus obras para piano?", "Frédéric Chopin", ["Franz Liszt", "Piotr Ilich Chaikovski", "Wolfgang Amadeus Mozart"]], ["¿Qué banda británica estaba formada por John, Paul, George y Ringo?", "The Beatles", ["The Rolling Stones", "Queen", "Pink Floyd"]], ["¿Qué festival musical se celebra cada año en Valledupar?", "Festival de la Leyenda Vallenata", ["Festival Petronio Álvarez", "Rock al Parque", "Festival Iberoamericano de Teatro"]], ["¿Qué festival de música del Pacífico colombiano se celebra en Cali?", "Festival Petronio Álvarez", ["Rock al Parque", "Festival Estéreo Picnic", "Festival de la Leyenda Vallenata"]], ["¿Qué cantante colombiano llevó el vallenato al mundo con el álbum “Clásicos de la Provincia”?", "Carlos Vives", ["Juanes", "Silvestre Dangond", "Diomedes Díaz"]], ["¿Cómo se llama el escudero de Don Quijote?", "Sancho Panza", ["Dulcinea", "Rocinante", "Lazarillo"]], ["¿Cómo se llama el caballo de Don Quijote?", "Rocinante", ["Babieca", "Bucéfalo", "Pegaso"]], ["¿Quién escribió “Platero y yo”?", "Juan Ramón Jiménez", ["Antonio Machado", "Federico García Lorca", "Pablo Neruda"]], ["¿Qué escritor colombiano escribió “El coronel no tiene quien le escriba”?", "Gabriel García Márquez", ["Álvaro Mutis", "Jorge Isaacs", "Fernando Vallejo"]], ["¿Qué cantante colombiana es conocida como “La Bichota”?", "Karol G", ["Shakira", "Greeicy", "Farina"]], ["¿De qué movimiento artístico fue figura principal Salvador Dalí?", "El surrealismo", ["El cubismo", "El impresionismo", "El barroco"]]], "Difícil": [["¿Quién escribió “La Odisea”?", "Homero", ["Virgilio", "Sófocles", "Platón"]], ["¿Quién escribió “El Principito”?", "Antoine de Saint-Exupéry", ["Victor Hugo", "Julio Verne", "Albert Camus"]], ["¿Quién compuso “Las cuatro estaciones”?", "Antonio Vivaldi", ["Johann Sebastian Bach", "Wolfgang Amadeus Mozart", "Frédéric Chopin"]], ["¿Quién pintó el techo de la Capilla Sixtina?", "Miguel Ángel", ["Leonardo da Vinci", "Rafael", "Botticelli"]], ["¿Quién pintó “La persistencia de la memoria”, con relojes derretidos?", "Salvador Dalí", ["Joan Miró", "René Magritte", "Pablo Picasso"]], ["¿Quién escribió “Crimen y castigo”?", "Fiódor Dostoyevski", ["León Tolstói", "Antón Chéjov", "Nikolái Gógol"]], ["¿Qué escritor argentino escribió “Ficciones”?", "Jorge Luis Borges", ["Julio Cortázar", "Ernesto Sabato", "Adolfo Bioy Casares"]], ["¿Quién compuso la ópera “La flauta mágica”?", "Wolfgang Amadeus Mozart", ["Giuseppe Verdi", "Richard Wagner", "Giacomo Puccini"]], ["¿En qué museo se exhibe la Mona Lisa?", "Museo del Louvre", ["Museo del Prado", "Galería Uffizi", "Museo Británico"]], ["¿Quién escribió “La Divina Comedia”?", "Dante Alighieri", ["Petrarca", "Boccaccio", "Virgilio"]], ["¿Qué autor colombiano escribió “La vorágine”?", "José Eustasio Rivera", ["Jorge Isaacs", "Álvaro Mutis", "Eduardo Caballero Calderón"]], ["¿Qué poeta chileno ganó el Premio Nobel de Literatura en 1971?", "Pablo Neruda", ["Gabriela Mistral", "Vicente Huidobro", "Nicanor Parra"]], ["¿Quién escribió “Fausto”?", "Johann Wolfgang von Goethe", ["Friedrich Schiller", "Thomas Mann", "Heinrich Heine"]], ["¿Quién escribió “Guerra y paz”?", "León Tolstói", ["Fiódor Dostoyevski", "Antón Chéjov", "Aleksandr Pushkin"]], ["¿Quién pintó “El jardín de las delicias”?", "El Bosco", ["Pieter Brueghel", "Alberto Durero", "Jan van Eyck"]], ["¿Quién pintó “La joven de la perla”?", "Johannes Vermeer", ["Rembrandt", "Pedro Pablo Rubens", "Anton van Dyck"]], ["¿Quién pintó “El grito”?", "Edvard Munch", ["Gustav Klimt", "Egon Schiele", "Vasili Kandinski"]], ["¿Qué pintor austriaco pintó el cuadro dorado “El beso”?", "Gustav Klimt", ["Edvard Munch", "Egon Schiele", "Oskar Kokoschka"]], ["¿Quién compuso el ballet “El lago de los cisnes”?", "Piotr Ilich Chaikovski", ["Ígor Stravinski", "Nikolái Rimski-Kórsakov", "Serguéi Prokófiev"]], ["¿Quién compuso la ópera “La traviata”?", "Giuseppe Verdi", ["Giacomo Puccini", "Gioachino Rossini", "Richard Wagner"]], ["¿Quién compuso la ópera “El barbero de Sevilla” de 1816?", "Gioachino Rossini", ["Giuseppe Verdi", "Wolfgang Amadeus Mozart", "Georges Bizet"]], ["¿Quién compuso la ópera “Carmen”?", "Georges Bizet", ["Giuseppe Verdi", "Giacomo Puccini", "Jacques Offenbach"]], ["¿Qué escritor colombiano escribió “La marquesa de Yolombó”?", "Tomás Carrasquilla", ["Jorge Isaacs", "José Eustasio Rivera", "Álvaro Mutis"]], ["¿Qué poeta colombiano es autor del célebre “Nocturno III”?", "José Asunción Silva", ["Rafael Pombo", "Porfirio Barba Jacob", "León de Greiff"]], ["¿Qué escritor colombiano creó al personaje Maqroll el Gaviero?", "Álvaro Mutis", ["Gabriel García Márquez", "Fernando Vallejo", "Héctor Rojas Herazo"]], ["¿Qué escritor peruano ganó el Premio Nobel de Literatura en 2010?", "Mario Vargas Llosa", ["Alfredo Bryce Echenique", "César Vallejo", "Ciro Alegría"]], ["¿Qué escritor mexicano escribió “Pedro Páramo”?", "Juan Rulfo", ["Carlos Fuentes", "Octavio Paz", "Juan José Arreola"]], ["¿Quién escribió “Rayuela”?", "Julio Cortázar", ["Jorge Luis Borges", "Ernesto Sabato", "Adolfo Bioy Casares"]], ["¿Quién escribió la novela “1984”?", "George Orwell", ["Aldous Huxley", "Ray Bradbury", "H. G. Wells"]], ["¿Quién escribió “Los miserables”?", "Victor Hugo", ["Alejandro Dumas", "Honoré de Balzac", "Gustave Flaubert"]], ["¿Qué escritora chilena fue la primera persona latinoamericana en ganar el Nobel de Literatura?", "Gabriela Mistral", ["Isabel Allende", "Alfonsina Storni", "María Luisa Bombal"]], ["¿Quién escribió “La metamorfosis”, en la que Gregorio Samsa se convierte en insecto?", "Franz Kafka", ["Thomas Mann", "Hermann Hesse", "Stefan Zweig"]], ["¿Qué arquitecto diseñó la Sagrada Familia de Barcelona?", "Antoni Gaudí", ["Le Corbusier", "Santiago Calatrava", "Lluís Domènech i Montaner"]], ["¿Qué pintor neerlandés pintó “La ronda de noche”?", "Rembrandt", ["Johannes Vermeer", "Frans Hals", "Vincent van Gogh"]], ["¿A qué movimiento artístico pertenece Andy Warhol?", "Arte pop", ["Expresionismo abstracto", "Dadaísmo", "Minimalismo"]], ["¿Qué pintor colombiano pintó en 1962 la obra “Violencia”?", "Alejandro Obregón", ["Fernando Botero", "Enrique Grau", "Omar Rayo"]]]}, "Deportes": {"Fácil": [["¿Cuántos jugadores tiene un equipo de fútbol en la cancha?", "11", ["9", "10", "12"]], ["¿En qué deporte se encesta un balón en un aro?", "Baloncesto", ["Rugby", "Voleibol", "Béisbol"]], ["¿En qué deporte se juega el torneo de Roland Garros?", "Tenis", ["Fútbol", "Golf", "Ciclismo"]], ["¿Qué deporte practica el colombiano Egan Bernal?", "Ciclismo", ["Atletismo", "Natación", "Fútbol"]], ["¿Cada cuántos años se celebran los Juegos Olímpicos de verano?", "4", ["2", "3", "5"]], ["¿Con qué parte del cuerpo no se puede tocar el balón en fútbol (salvo el portero)?", "Las manos", ["Los pies", "La cabeza", "El pecho"]], ["¿En qué deporte se utiliza un bate?", "Béisbol", ["Fútbol", "Tenis", "Natación"]], ["¿Qué color de tarjeta expulsa a un jugador en el fútbol?", "Roja", ["Amarilla", "Azul", "Verde"]], ["¿En qué deporte se compite con los estilos crol y mariposa?", "Natación", ["Esgrima", "Ciclismo", "Atletismo"]], ["¿Cuántos jugadores de un equipo de baloncesto están en la cancha?", "5", ["6", "7", "11"]], ["¿Cuántos jugadores de un equipo de voleibol están en la cancha?", "6", ["5", "7", "8"]], ["¿Qué deporte practica Lionel Messi?", "Fútbol", ["Baloncesto", "Béisbol", "Tenis"]], ["¿Cuántos puntos vale un gol en el fútbol?", "1", ["2", "3", "5"]], ["¿Qué deporte se juega con raquetas y una pelota amarilla que pasa sobre una red?", "Tenis", ["Bádminton", "Ping-pong", "Voleibol"]], ["¿Qué deporte se juega con un balón ovalado y en el que se anotan “tries”?", "Rugby", ["Fútbol", "Béisbol", "Balonmano"]], ["¿Qué medalla gana quien llega en primer lugar en los Juegos Olímpicos?", "Medalla de oro", ["Medalla de plata", "Medalla de bronce", "Diploma"]], ["¿En qué deporte se usan guantes para golpear al rival dentro de un ring?", "Boxeo", ["Esgrima", "Judo", "Lucha libre"]], ["¿Qué deporte se juega sobre hielo con palos y un disco?", "Hockey sobre hielo", ["Curling", "Patinaje artístico", "Esquí"]], ["¿Qué jugador de fútbol puede tocar el balón con las manos dentro de su área?", "El portero", ["El defensa", "El delantero", "El árbitro"]], ["¿Qué deporte practica la colombiana Mariana Pajón?", "BMX", ["Atletismo", "Patinaje", "Natación"]], ["¿Qué deporte practicaba la colombiana Caterine Ibargüen?", "Atletismo", ["Natación", "Ciclismo", "Levantamiento de pesas"]], ["¿Cómo se le dice a la selección de fútbol de Colombia por los colores de su bandera?", "La Tricolor", ["La Albiceleste", "La Roja", "La Canarinha"]], ["¿Cada cuántos años se juega el Mundial de fútbol masculino?", "4", ["2", "3", "5"]], ["¿Qué deporte se juega sobre una mesa con raquetas pequeñas?", "Tenis de mesa", ["Billar", "Bádminton", "Squash"]], ["¿En qué deporte se lanza una bola para derribar 10 pinos?", "Bolos", ["Golf", "Billar", "Petanca"]], ["¿Qué deporte combina natación, ciclismo y carrera a pie?", "Triatlón", ["Pentatlón", "Decatlón", "Biatlón"]], ["¿Cómo se llama la persona que dirige un partido de fútbol?", "Árbitro", ["Entrenador", "Capitán", "Utilero"]], ["¿En cuántos tiempos se divide un partido de fútbol?", "2", ["3", "4", "1"]], ["¿Qué deporte se practica con una tabla sobre las olas del mar?", "Surf", ["Esquí", "Remo", "Vela"]], ["¿En qué deporte se intenta meter una pelota en un hoyo con el menor número de golpes?", "Golf", ["Billar", "Croquet", "Hockey"]], ["¿En qué juego se busca dar “jaque mate” al rey del rival?", "Ajedrez", ["Damas", "Parqués", "Dominó"]], ["¿Qué deporte se juega golpeando un balón con las manos por encima de una red alta?", "Voleibol", ["Baloncesto", "Balonmano", "Tenis"]], ["¿Qué carrera de ciclismo se corre cada año en julio en Francia?", "Tour de Francia", ["Giro de Italia", "Vuelta a España", "Vuelta a Colombia"]], ["¿Qué deporte se practica con un arco y flechas?", "Tiro con arco", ["Esgrima", "Tiro deportivo", "Lanzamiento de jabalina"]], ["¿Cuántas ruedas tiene una bicicleta?", "2", ["3", "1", "4"]], ["¿En qué deporte se usan botas con cuchillas para deslizarse sobre el hielo?", "Patinaje sobre hielo", ["Esquí", "Snowboard", "Trineo"]]], "Media": [["¿Cuál es el deporte nacional de Colombia?", "Tejo", ["Fútbol", "Ciclismo", "Microfútbol"]], ["¿Qué país organizó el Mundial de fútbol de 2014?", "Brasil", ["Alemania", "Sudáfrica", "Rusia"]], ["¿Qué selección ganó el Mundial de fútbol de 2010?", "España", ["Países Bajos", "Alemania", "Brasil"]], ["¿Qué selección ganó el Mundial de Qatar 2022?", "Argentina", ["Francia", "Croacia", "Brasil"]], ["¿Cuántos minutos dura un partido de fútbol profesional sin contar el descuento?", "90", ["60", "80", "120"]], ["¿En qué país se originaron los antiguos Juegos Olímpicos?", "Grecia", ["Italia", "Egipto", "Turquía"]], ["¿Qué colombiano ganó el Tour de Francia en 2019?", "Egan Bernal", ["Nairo Quintana", "Rigoberto Urán", "Esteban Chaves"]], ["¿Cuántos puntos vale un tiro de tres en baloncesto?", "3", ["2", "4", "5"]], ["¿Cuántos kilómetros mide un maratón?", "42,195", ["21,097", "10", "50"]], ["¿En qué país se juega el torneo de tenis de Wimbledon?", "Reino Unido", ["Estados Unidos", "Francia", "Australia"]], ["¿Cómo se llama el estadio del Real Madrid?", "Santiago Bernabéu", ["Camp Nou", "San Siro", "Maracaná"]], ["¿En qué país se originó el judo?", "Japón", ["China", "Corea del Sur", "Tailandia"]], ["¿Qué selección ganó el Mundial de fútbol de 2018?", "Francia", ["Croacia", "Bélgica", "Alemania"]], ["¿Qué selección ganó el Mundial de fútbol de 2014?", "Alemania", ["Argentina", "Brasil", "Países Bajos"]], ["¿Qué país organizó el Mundial de fútbol de 2022?", "Catar", ["Rusia", "Emiratos Árabes Unidos", "Arabia Saudita"]], ["¿Cuántos jugadores de un equipo de béisbol están en el campo defendiendo?", "9", ["11", "8", "10"]], ["¿Cuántos sets necesita ganar un tenista para ganar un partido masculino de Grand Slam?", "3", ["2", "4", "5"]], ["¿Qué club tiene como estadio el Camp Nou?", "FC Barcelona", ["Real Madrid", "Atlético de Madrid", "Valencia"]], ["¿Qué colombiano fue el goleador del Mundial de 2014?", "James Rodríguez", ["Radamel Falcao", "Juan Guillermo Cuadrado", "Jackson Martínez"]], ["¿Qué piloto colombiano corrió en la Fórmula 1 con Williams y McLaren?", "Juan Pablo Montoya", ["Gabby Chaves", "Roberto Guerrero", "Tatiana Calderón"]], ["¿Qué pesista ganó en Sídney 2000 la primera medalla de oro olímpica de Colombia?", "María Isabel Urrutia", ["Mabel Mosquera", "Ubaldina Valoyes", "Leidy Solís"]], ["¿Cuántos jugadores por equipo tiene en el campo el rugby tradicional (rugby union)?", "15", ["11", "13", "7"]], ["¿Qué ciclista colombiano ganó el Giro de Italia en 2014?", "Nairo Quintana", ["Rigoberto Urán", "Egan Bernal", "Esteban Chaves"]], ["¿Cuántos minutos dura cada cuarto de un partido de la NBA?", "12", ["10", "15", "20"]], ["¿Qué selección ha ganado más Mundiales de fútbol masculino?", "Brasil", ["Alemania", "Italia", "Argentina"]], ["¿En qué deporte se hizo famoso Michael Jordan?", "Baloncesto", ["Tenis", "Fútbol americano", "Golf"]], ["¿En qué deporte compitió Michael Phelps?", "Natación", ["Atletismo", "Ciclismo", "Remo"]], ["¿Qué tenista suizo ganó 20 títulos de Grand Slam?", "Roger Federer", ["Stan Wawrinka", "Rafael Nadal", "Novak Djokovic"]], ["¿Qué equipo colombiano ganó la Copa Libertadores en 2016?", "Atlético Nacional", ["Once Caldas", "Millonarios", "América de Cali"]], ["¿Cuántos jugadores de un equipo de microfútbol están en la cancha?", "5", ["6", "7", "4"]], ["¿Cuántos metros de largo mide una piscina olímpica?", "50", ["25", "100", "75"]], ["¿Qué arte marcial coreano es famoso por sus patadas?", "Taekwondo", ["Karate", "Judo", "Kung fu"]], ["¿En qué ciudad se celebraron los Juegos Olímpicos de 2012?", "Londres", ["Pekín", "Atenas", "Sídney"]], ["¿Qué futbolista portugués es conocido como “CR7”?", "Cristiano Ronaldo", ["Luís Figo", "Eusébio", "Bruno Fernandes"]], ["¿Qué pieza de ajedrez se mueve en forma de “L”?", "El caballo", ["El alfil", "La torre", "La reina"]], ["¿En qué categoría de automovilismo se corre el famoso Gran Premio de Mónaco?", "Fórmula 1", ["NASCAR", "Rally Dakar", "IndyCar"]]], "Difícil": [["¿En qué ciudad se celebraron los Juegos Olímpicos de 2016?", "Río de Janeiro", ["Londres", "Pekín", "Tokio"]], ["¿Quién tiene más títulos de Grand Slam en tenis masculino?", "Novak Djokovic", ["Rafael Nadal", "Roger Federer", "Pete Sampras"]], ["¿Cuántos anillos tiene la bandera olímpica?", "5", ["4", "6", "7"]], ["¿Qué atleta tiene el récord mundial de los 100 metros planos (9,58 s)?", "Usain Bolt", ["Yohan Blake", "Asafa Powell", "Tyson Gay"]], ["¿En qué año se jugó el primer Mundial de fútbol?", "1930", ["1924", "1934", "1950"]], ["¿Qué selección ganó el primer Mundial de fútbol?", "Uruguay", ["Argentina", "Brasil", "Italia"]], ["¿Qué selección ha participado en todos los Mundiales de fútbol?", "Brasil", ["Alemania", "Argentina", "Italia"]], ["¿En qué deporte se utilizan los llamados “búnkeres”?", "Golf", ["Béisbol", "Polo", "Tenis"]], ["¿Cuántas piezas tiene cada jugador al empezar una partida de ajedrez?", "16", ["12", "20", "32"]], ["¿Hasta qué ronda llegó Colombia en el Mundial de 2014?", "Cuartos de final", ["Octavos de final", "Semifinales", "Fase de grupos"]], ["¿Qué deporte olímpico combina esquí de fondo y tiro con rifle?", "Biatlón", ["Pentatlón moderno", "Triatlón", "Curling"]], ["¿Qué país ha ganado más medallas de oro en los Juegos Olímpicos de verano?", "Estados Unidos", ["Unión Soviética", "China", "Alemania"]], ["¿Qué equipo colombiano ganó la Copa Libertadores en 2004?", "Once Caldas", ["Atlético Nacional", "América de Cali", "Deportivo Cali"]], ["¿Qué selección ganó la primera Copa América, en 1916?", "Uruguay", ["Argentina", "Brasil", "Chile"]], ["¿En qué año ganó Colombia la Copa América?", "2001", ["1999", "2004", "2011"]], ["¿Cuántos jugadores de un equipo de waterpolo están en el agua?", "7", ["6", "9", "11"]], ["¿Qué país ha ganado más Copas del Mundo de rugby?", "Sudáfrica", ["Nueva Zelanda", "Australia", "Inglaterra"]], ["¿Qué boxeador era conocido como “El más grande” (The Greatest)?", "Muhammad Ali", ["Mike Tyson", "Joe Frazier", "George Foreman"]], ["¿En qué ciudad se celebraron los primeros Juegos Olímpicos modernos, en 1896?", "Atenas", ["París", "Londres", "Roma"]], ["¿Quién impulsó la creación de los Juegos Olímpicos modernos?", "Pierre de Coubertin", ["Avery Brundage", "Juan Antonio Samaranch", "Jacques Rogge"]], ["¿Qué ciclista fue el primer colombiano en ganar una etapa del Tour de Francia, en 1984?", "Luis “Lucho” Herrera", ["Fabio Parra", "Martín Ramírez", "Martín Emilio “Cochise” Rodríguez"]], ["¿Qué futbolista ha ganado más Balones de Oro?", "Lionel Messi", ["Cristiano Ronaldo", "Michel Platini", "Johan Cruyff"]], ["¿En qué país se inventó el voleibol?", "Estados Unidos", ["Japón", "Brasil", "Rusia"]], ["¿Quién inventó el baloncesto?", "James Naismith", ["William G. Morgan", "Abner Doubleday", "Walter Camp"]], ["¿Qué país organizó el Mundial de 1986, después de que Colombia renunciara a hacerlo?", "México", ["Argentina", "España", "Estados Unidos"]], ["¿Qué selección ganó la Eurocopa de 2016?", "Portugal", ["Francia", "Alemania", "España"]], ["¿Cuántos hoyos tiene un recorrido estándar de golf?", "18", ["9", "12", "21"]], ["¿Qué tenista tiene más títulos de Roland Garros?", "Rafael Nadal", ["Novak Djokovic", "Roger Federer", "Björn Borg"]], ["¿Cuántos jugadores por equipo hay en la pista en el hockey sobre hielo, contando al portero?", "6", ["5", "7", "11"]], ["¿Qué selección ganó el Mundial de fútbol de 1998?", "Francia", ["Brasil", "Italia", "Croacia"]], ["¿Qué colombiano marcó un gol olímpico a la Unión Soviética en el Mundial de 1962?", "Marcos Coll", ["Delio “Maravilla” Gamboa", "Efraín “Caimán” Sánchez", "Willington Ortiz"]], ["¿Qué arquero colombiano hizo famoso el “escorpión” en Wembley en 1995?", "René Higuita", ["Óscar Córdoba", "Faryd Mondragón", "David Ospina"]], ["¿Sobre qué superficie se juega el torneo de Wimbledon?", "Césped", ["Arcilla", "Pista dura", "Moqueta"]], ["¿Qué país ganó el primer Mundial de fútbol femenino, en 1991?", "Estados Unidos", ["Noruega", "China", "Alemania"]], ["¿Qué gimnasta rumana logró el primer 10 perfecto de la historia olímpica?", "Nadia Comăneci", ["Simone Biles", "Olga Korbut", "Larisa Latynina"]], ["¿En qué año se celebraron los primeros Juegos Olímpicos de invierno?", "1924", ["1900", "1936", "1948"]]]}, "Cultura general": {"Fácil": [["¿Cuántos días tiene una semana?", "7", ["5", "6", "8"]], ["¿De qué color se ve el cielo en un día despejado?", "Azul", ["Verde", "Rojo", "Amarillo"]], ["¿Cuántos meses tiene un año?", "12", ["10", "11", "13"]], ["¿Cuántas horas tiene un día?", "24", ["12", "20", "48"]], ["¿Cuál es el resultado de 7 × 8?", "56", ["54", "48", "64"]], ["¿Cuántos lados tiene un triángulo?", "3", ["2", "4", "5"]], ["¿Qué fruta es alargada, amarilla y se pela para comerla?", "Banano", ["Fresa", "Piña", "Uva"]], ["¿Qué producen las vacas y bebemos todos los días?", "Leche", ["Aceite", "Miel", "Vino"]], ["¿Cuántos días tiene febrero en un año normal?", "28", ["29", "30", "31"]], ["¿Cuántos centímetros tiene un metro?", "100", ["10", "1.000", "50"]], ["¿En qué fecha se celebra la Navidad?", "25 de diciembre", ["1 de enero", "31 de octubre", "6 de enero"]], ["¿Cuántos minutos tiene una hora?", "60", ["50", "100", "120"]], ["¿Cuántas patas tiene un perro?", "4", ["2", "6", "8"]], ["¿Cuál es el resultado de 5 + 7?", "12", ["11", "13", "10"]], ["¿Cuántos días tiene un año normal?", "365", ["360", "366", "364"]], ["¿Qué día de la semana viene después del lunes?", "Martes", ["Miércoles", "Domingo", "Jueves"]], ["¿Cuál es el primer mes del año?", "Enero", ["Febrero", "Diciembre", "Marzo"]], ["¿Qué color del semáforo indica que hay que detenerse?", "Rojo", ["Verde", "Amarillo", "Azul"]], ["¿Cuántas ruedas tiene un carro común?", "4", ["3", "6", "2"]], ["¿Qué animal hace “miau”?", "Gato", ["Perro", "Vaca", "Pato"]], ["¿Qué objeto usamos para saber la hora?", "Reloj", ["Calendario", "Brújula", "Termómetro"]], ["¿Cuántos lados tiene un cuadrado?", "4", ["3", "5", "6"]], ["¿Cuál es el resultado de 10 − 3?", "7", ["6", "8", "13"]], ["¿Cuántas estaciones tiene el año en los países de clima templado?", "4", ["2", "3", "6"]], ["¿Qué número viene después del 99?", "100", ["101", "98", "1.000"]], ["¿Cuál es la mitad de 50?", "25", ["20", "30", "15"]], ["¿De qué fruta se hace la limonada?", "Limón", ["Naranja", "Mango", "Manzana"]], ["¿En qué lugar se compran los medicamentos?", "Farmacia", ["Panadería", "Ferretería", "Librería"]], ["¿Qué profesional apaga los incendios?", "Bombero", ["Policía", "Médico", "Cartero"]], ["¿Cuántas horas tiene medio día?", "12", ["6", "24", "10"]], ["¿Qué bebida se prepara con los granos tostados del cafeto?", "Café", ["Té", "Chocolate", "Jugo"]], ["¿Con qué letra empieza el abecedario?", "A", ["B", "Z", "E"]], ["¿Cuál es el doble de 8?", "16", ["14", "18", "12"]], ["¿Qué forma tiene un balón de fútbol?", "Esférica", ["Cuadrada", "Triangular", "Ovalada"]], ["¿Qué electrodoméstico mantiene frescos los alimentos?", "Nevera", ["Horno", "Licuadora", "Lavadora"]], ["¿Qué fiesta se celebra el 31 de octubre en muchos países?", "Halloween", ["Navidad", "Año Nuevo", "Día de la Madre"]]], "Media": [["¿Cómo se llama el sistema de lectura y escritura para personas ciegas?", "Braille", ["Morse", "Cuneiforme", "Jeroglífico"]], ["¿Cuál es la lengua con más hablantes nativos del mundo?", "Chino mandarín", ["Inglés", "Español", "Hindi"]], ["¿Qué empresa creó el iPhone?", "Apple", ["Samsung", "Google", "Microsoft"]], ["¿Qué significan las siglas WWW en internet?", "World Wide Web", ["World Web Wide", "Wide World Web", "Web World Wide"]], ["¿Qué plato típico colombiano lleva frijoles, arroz, chicharrón, huevo y arepa?", "Bandeja paisa", ["Ajiaco", "Sancocho", "Lechona"]], ["¿De qué país es originaria la pizza?", "Italia", ["Francia", "Grecia", "Estados Unidos"]], ["¿Cuál es el buscador de internet más usado del mundo?", "Google", ["Bing", "Yahoo", "DuckDuckGo"]], ["¿Cuántas casillas tiene un tablero de ajedrez?", "64", ["36", "49", "81"]], ["¿Cuántos lados tiene un hexágono?", "6", ["5", "7", "8"]], ["¿Cuál es el resultado de 12 × 12?", "144", ["124", "132", "154"]], ["¿Cuánto es el 15 % de 200?", "30", ["20", "25", "35"]], ["¿Cuál es el ingrediente principal del guacamole?", "Aguacate", ["Tomate", "Pepino", "Pimentón"]], ["¿Qué red social tenía un pájaro azul en su logo original?", "Twitter (hoy X)", ["Facebook", "Instagram", "TikTok"]], ["¿Quién fundó Facebook?", "Mark Zuckerberg", ["Bill Gates", "Elon Musk", "Jeff Bezos"]], ["¿Cuántos segundos tiene una hora?", "3.600", ["360", "6.000", "1.000"]], ["¿Cuál es el resultado de 9 × 9?", "81", ["72", "99", "89"]], ["¿Cuántos años tiene un siglo?", "100", ["10", "1.000", "50"]], ["¿Cuántos años tiene una década?", "10", ["100", "5", "12"]], ["¿Qué empresa fabrica la consola PlayStation?", "Sony", ["Nintendo", "Microsoft", "Sega"]], ["¿Qué empresa creó el sistema operativo Windows?", "Microsoft", ["Apple", "Google", "IBM"]], ["¿Qué bebida colombiana se prepara con panela disuelta en agua?", "Aguapanela", ["Chocolate", "Tinto", "Avena"]], ["¿Qué plato típico bogotano lleva papas, pollo y guascas?", "Ajiaco", ["Sancocho", "Mute", "Mondongo"]], ["¿Qué ave es el símbolo patrio de Colombia?", "El cóndor de los Andes", ["El águila real", "El colibrí", "El tucán"]], ["¿Cuál es la flor nacional de Colombia?", "La orquídea", ["La rosa", "El girasol", "La margarita"]], ["¿Cuál es el árbol nacional de Colombia?", "La palma de cera", ["La ceiba", "El guayacán", "El roble"]], ["¿Qué número representa la letra V en números romanos?", "5", ["10", "50", "1"]], ["¿Cuántos lados tiene un pentágono?", "5", ["6", "4", "8"]], ["¿Cuánto es el 25 % de 100?", "25", ["50", "20", "75"]], ["¿Qué gas se usa para que los globos floten en el aire?", "Helio", ["Oxígeno", "Nitrógeno", "Dióxido de carbono"]], ["¿Qué aplicación de mensajería tiene un logo verde con un teléfono?", "WhatsApp", ["Telegram", "Messenger", "Signal"]], ["¿Cuál es el resultado de 100 ÷ 5?", "20", ["25", "15", "50"]], ["¿Qué moneda se usa en la mayoría de los países de la Unión Europea?", "Euro", ["Dólar", "Libra", "Franco"]], ["¿Cuál es la moneda de Japón?", "Yen", ["Yuan", "Won", "Rupia"]], ["¿Qué día se celebra el Día del Idioma en Colombia?", "23 de abril", ["12 de octubre", "20 de julio", "1 de mayo"]], ["¿Cuántas cartas tiene una baraja de póker sin comodines?", "52", ["40", "48", "54"]], ["¿Qué figura tiene todos sus puntos a la misma distancia del centro?", "Círculo", ["Cuadrado", "Triángulo", "Rombo"]]], "Difícil": [["¿En qué año recibió García Márquez el Premio Nobel de Literatura?", "1982", ["1967", "1975", "1990"]], ["¿Quién cofundó Microsoft junto a Paul Allen?", "Bill Gates", ["Steve Jobs", "Mark Zuckerberg", "Jeff Bezos"]], ["¿Cuál es la raíz cuadrada de 144?", "12", ["11", "14", "16"]], ["¿Qué significa la sigla CPU?", "Unidad Central de Procesamiento", ["Unidad Central de Programas", "Control Principal de Usuario", "Unidad Computacional Portátil"]], ["¿En qué año se lanzó el primer iPhone?", "2007", ["2005", "2009", "2010"]], ["¿Cuántos dígitos distintos usa el sistema binario?", "2", ["8", "10", "16"]], ["¿Cuántos lados tiene un decágono?", "10", ["8", "9", "12"]], ["¿Qué número representa la letra L en números romanos?", "50", ["5", "100", "500"]], ["¿Qué país inventó el papel?", "China", ["Egipto", "India", "Grecia"]], ["¿Cuál es el resultado de 2 elevado a la 10?", "1.024", ["512", "2.048", "1.000"]], ["¿Quién obtuvo en 1876 la patente del teléfono?", "Alexander Graham Bell", ["Thomas Edison", "Nikola Tesla", "Guglielmo Marconi"]], ["¿Qué significa la sigla ONU?", "Organización de las Naciones Unidas", ["Organización Nacional de Uniones", "Orden Mundial de Naciones", "Observatorio de Naciones Unidas"]], ["¿Qué significa la sigla USB?", "Bus Universal en Serie", ["Unidad de Sistema Básico", "Usuario de Servicio Binario", "Unidad Serial de Bits"]], ["¿Qué significa la sigla HTML?", "Lenguaje de Marcado de Hipertexto", ["Protocolo de Transferencia de Hipertexto", "Lenguaje de Máquina de Alto Nivel", "Herramienta de Texto para Manejo de Listas"]], ["¿Cuántos bits tiene un byte?", "8", ["4", "16", "10"]], ["¿Cuál es el número primo más pequeño?", "2", ["1", "3", "0"]], ["¿Qué número representa la letra M en números romanos?", "1.000", ["500", "100", "10.000"]], ["¿Cuál es el resultado de 15 × 15?", "225", ["215", "250", "235"]], ["¿Cuál es el valor aproximado del número pi?", "3,1416", ["3,1614", "2,7182", "1,6180"]], ["¿Cuántos grados suman los ángulos internos de un triángulo?", "180", ["90", "360", "270"]], ["¿Quién fundó la empresa SpaceX?", "Elon Musk", ["Jeff Bezos", "Richard Branson", "Bill Gates"]], ["¿Qué empresa es dueña del sistema operativo Android?", "Google", ["Apple", "Samsung", "Microsoft"]], ["¿En qué año se fundó Google?", "1998", ["1994", "2001", "2004"]], ["¿Qué significa la sigla OMS?", "Organización Mundial de la Salud", ["Oficina Mundial de Sanidad", "Organización Médica de Suramérica", "Orden Mundial de la Salud"]], ["¿Cuál es el resultado de 3 elevado al cubo?", "27", ["9", "6", "81"]], ["¿Qué significa la sigla ADN?", "Ácido desoxirribonucleico", ["Ácido dinucleico natural", "Ácido desoxirribonitrógeno", "Ácido diribonucleico"]], ["¿Cuántos años de matrimonio se celebran en las bodas de plata?", "25", ["50", "10", "40"]], ["¿Cuántos años de matrimonio se celebran en las bodas de oro?", "50", ["25", "60", "75"]], ["¿En qué ciudad está la sede principal de la ONU?", "Nueva York", ["Ginebra", "Washington", "París"]], ["¿Quién creó la World Wide Web?", "Tim Berners-Lee", ["Vint Cerf", "Bill Gates", "Steve Jobs"]], ["¿Cuál es la raíz cuadrada de 169?", "13", ["12", "14", "17"]], ["¿Cómo se escribe el número 9 en números romanos?", "IX", ["XI", "VIIII", "IIX"]], ["¿Cuál es la moneda del Reino Unido?", "Libra esterlina", ["Euro", "Dólar", "Franco"]], ["¿Qué país tiene como moneda el yuan?", "China", ["Japón", "Corea del Sur", "Vietnam"]], ["¿Cuántos ceros tiene un millón?", "6", ["5", "7", "9"]], ["¿Cuántos ceros tiene un billón en español?", "12", ["9", "6", "15"]]]}};
+  const CATEGORIAS = ["Geografía", "Historia", "Ciencia", "Arte y Literatura", "Deportes", "Cultura general"];
+  const ICONOS = {"Mixto": "🎲", "Geografía": "🌎", "Historia": "🏛️", "Ciencia": "🔬", "Arte y Literatura": "🎨", "Deportes": "⚽", "Cultura general": "🧠"};
+  const PREMIOS_BASE = [100000, 200000, 300000, 500000, 1000000, 2000000, 4000000, 8000000, 16000000, 32000000, 64000000, 125000000, 250000000, 500000000, 1000000000];
+  const DIFICULTADES = {"Fácil": {"icono": "🟢", "mezcla": [8, 5, 2], "porcentaje": 10, "descripcion": "Más preguntas sencillas. Premios pequeños."}, "Normal": {"icono": "🟡", "mezcla": [5, 5, 5], "porcentaje": 100, "descripcion": "Equilibrio entre fáciles, medias y difíciles."}, "Difícil": {"icono": "🔴", "mezcla": [2, 5, 8], "porcentaje": 300, "descripcion": "Casi todo es difícil, pero los premios se triplican."}};
+  const NOMBRES_DIFICULTAD = ["Fácil", "Normal", "Difícil"];
+  const NIVELES_SEGUROS = [5, 10];
+  const MAX_JUGADORES = 4;
+  const SEGUNDOS_AMIGO = 30;
+  const CLAVE_RANKING = "millonario_ranking";
+  const CLAVE_USADAS = "millonario_usadas";
+
+  // ---- Guardado en el navegador (reemplaza ranking.csv y preguntas_usadas.txt) ----
+  const memoria = {};
+  function leerGuardado(clave) {
+    try {
+      const texto = localStorage.getItem(clave);
+      if (texto) { return JSON.parse(texto); }
+    } catch (e) {}
+    return memoria[clave] || [];
+  }
+  function escribirGuardado(clave, valor) {
+    memoria[clave] = valor;
+    try { localStorage.setItem(clave, JSON.stringify(valor)); } catch (e) {}
+  }
+
+  // ---- Utilidades ----
+  function pesos(valor) {
+    return "$" + Math.round(valor).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  }
+  function textoCorrectas(cantidad) {
+    return cantidad === 1 ? "1 correcta" : cantidad + " correctas";
+  }
+  function enteroAlAzar(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function mezclar(lista) {
+    for (let i = lista.length - 1; i > 0; i--) {
+      const k = Math.floor(Math.random() * (i + 1));
+      const t = lista[i]; lista[i] = lista[k]; lista[k] = t;
+    }
+    return lista;
+  }
+  function muestra(lista, cantidad) { return mezclar(lista.slice()).slice(0, cantidad); }
+
+  // ---- Lógica del juego ----
+  function calcularPremios(porcentaje) {
+    return PREMIOS_BASE.map(function (base) { return Math.floor(base * porcentaje / 100); });
+  }
+  function nivelDePregunta(numero, mezcla) {
+    if (numero <= mezcla[0]) { return "Fácil"; }
+    else if (numero <= mezcla[0] + mezcla[1]) { return "Media"; }
+    return "Difícil";
+  }
+  function bancoDe(categoria, nivel) {
+    const nombres = categoria === "Mixto" ? CATEGORIAS : [categoria];
+    const banco = [];
+    for (const nombre of nombres) {
+      for (const p of BANCO[nombre][nivel]) { banco.push([p[0], p[1], p[2], nombre]); }
+    }
+    return banco;
+  }
+  function contarPreguntas(categoria) {
+    let total = 0;
+    for (const nivel of ["Fácil", "Media", "Difícil"]) { total = total + bancoDe(categoria, nivel).length; }
+    return total;
+  }
+  function armarPregunta(plantilla) {
+    const opciones = mezclar([plantilla[1]].concat(plantilla[2]));
+    return [plantilla[0], opciones, opciones.indexOf(plantilla[1]), plantilla[3]];
+  }
+  function premioAlFallar(correctas, asegurado, premios) {
+    let base = 0;
+    if (correctas >= 10) { base = premios[9]; }
+    else if (correctas >= 5) { base = premios[4]; }
+    return asegurado > base ? asegurado : base;
+  }
+  function premioAlRetirarse(correctas, premios) {
+    return correctas === 0 ? 0 : premios[correctas - 1];
+  }
+  function opcionesAQuitar(correcta, dejar) {
+    const quitar = [];
+    for (let i = 0; i < 4; i++) { if (i !== correcta && i !== dejar) { quitar.push(i); } }
+    return quitar;
+  }
+  function validarNombre(nombre) {
+    nombre = String(nombre).trim();
+    if (nombre.length < 2) { return [false, "El nombre debe tener al menos 2 caracteres."]; }
+    if (nombre.length > 20) { return [false, "El nombre no puede tener más de 20 caracteres."]; }
+    return [true, nombre];
+  }
+  function validarJugadores(nombres) {
+    if (!Array.isArray(nombres) || nombres.length < 1 || nombres.length > MAX_JUGADORES) {
+      return [false, "Debe haber entre 1 y " + MAX_JUGADORES + " jugadores."];
+    }
+    const limpios = [];
+    for (const nombre of nombres) {
+      const r = validarNombre(nombre);
+      if (!r[0]) { return [false, "Jugador " + (limpios.length + 1) + ": " + r[1]]; }
+      for (const existente of limpios) {
+        if (existente.toLowerCase() === r[1].toLowerCase()) {
+          return [false, "Los nombres de los jugadores no pueden repetirse."];
+        }
+      }
+      limpios.push(r[1]);
+    }
+    return [true, limpios];
+  }
+  function validarIndice(dato, eliminadas) {
+    const indice = parseInt(dato, 10);
+    if (isNaN(indice) || indice < 0 || indice > 3) { return [false, "Elige una opción válida: A, B, C o D."]; }
+    if (eliminadas.includes(indice)) { return [false, "Esa opción ya fue eliminada por el 50:50."]; }
+    return [true, indice];
+  }
+  function validarTelefono(texto) {
+    let limpio = String(texto).replace(/\D/g, "");
+    if (limpio.length === 12 && limpio.startsWith("57")) { limpio = limpio.slice(2); }
+    if (limpio.length !== 10 || !limpio.startsWith("3")) {
+      return [false, "Escribe un celular colombiano de 10 dígitos que empiece por 3 (ej: 300 123 4567)."];
+    }
+    return [true, limpio];
+  }
+  function formatoTelefono(n) { return n.slice(0, 3) + " " + n.slice(3, 6) + " " + n.slice(6); }
+  function mensajeParaAmigo(nombreAmigo, pregunta, eliminadas) {
+    let texto = "¡Hola " + nombreAmigo + "! Estoy jugando ¿Quién quiere ser millonario? y necesito tu ayuda.\n\n";
+    texto = texto + pregunta[0] + "\n";
+    for (let i = 0; i < 4; i++) {
+      if (!eliminadas.includes(i)) { texto = texto + LETRAS[i] + ") " + pregunta[1][i] + "\n"; }
+    }
+    return texto + "\n¿Cuál crees que es? Tienes " + SEGUNDOS_AMIGO + " segundos 🙏";
+  }
+  function escalera(nivel, premios) {
+    const filas = [];
+    for (let i = premios.length - 1; i >= 0; i--) {
+      filas.push({texto: (i + 1) + ". " + pesos(premios[i]), actual: i === nivel,
+                  superado: i < nivel, seguro: NIVELES_SEGUROS.includes(i + 1)});
+    }
+    return filas;
+  }
+  function buscarSiguienteJugador(jugadores, actual) {
+    const cantidad = jugadores.length;
+    for (let paso = 1; paso <= cantidad; paso++) {
+      const indice = (actual + paso) % cantidad;
+      if (jugadores[indice].estado === "jugando") { return indice; }
+    }
+    return -1;
+  }
+  function mismaClave(a, b) { return a.premio === b.premio && a.nivel === b.nivel; }
+  function tablaFinal(jugadores) {
+    const detalles = {millonario: "¡Millonario!", retirado: "Se retiró", eliminado: "Eliminado", jugando: "En juego"};
+    const medallas = ["🥇", "🥈", "🥉", "4º"];
+    const orden = jugadores.slice().sort(function (a, b) { return (b.premio - a.premio) || (b.nivel - a.nivel); });
+    const filas = [];
+    let puesto = 1;
+    for (let p = 0; p < orden.length; p++) {
+      const j = orden[p];
+      if (p > 0 && !mismaClave(j, orden[p - 1])) { puesto = p + 1; }
+      filas.push({puesto: medallas[puesto - 1], nombre: j.nombre, premio: pesos(j.premio),
+                  correctas: textoCorrectas(j.nivel), detalle: detalles[j.estado]});
+    }
+    return filas;
+  }
+
+  // ---- Ranking y preguntas usadas ----
+  function guardarResultado(nombre, correctas, premio, categoria, dificultad) {
+    const filas = leerGuardado(CLAVE_RANKING);
+    filas.push({fecha: new Date().toISOString().slice(0, 16).replace("T", " "), nombre: nombre,
+                correctas: correctas, premio: premio, categoria: categoria, dificultad: dificultad});
+    escribirGuardado(CLAVE_RANKING, filas);
+  }
+  function leerRanking() {
+    const filas = leerGuardado(CLAVE_RANKING).slice();
+    filas.sort(function (a, b) { return b.premio - a.premio; });
+    const top = filas.slice(0, 5).map(function (f) {
+      return f.nombre + " — " + pesos(f.premio) + " (" + textoCorrectas(f.correctas) + (f.dificultad ? " · " + f.dificultad : "") + ")";
+    });
+    return [top, leerGuardado(CLAVE_RANKING).length];
+  }
+  function marcarUsada(texto) {
+    const usadas = leerGuardado(CLAVE_USADAS);
+    usadas.push(texto);
+    escribirGuardado(CLAVE_USADAS, usadas);
+  }
+  function olvidarBanco(banco) {
+    const textos = banco.map(function (p) { return p[0]; });
+    escribirGuardado(CLAVE_USADAS, leerGuardado(CLAVE_USADAS).filter(function (t) { return !textos.includes(t); }));
+  }
+  function elegirDelBanco(banco, cantidad, usadas, excluir) {
+    const disponibles = banco.filter(function (p) { return !usadas.includes(p[0]) && !excluir.includes(p[0]); });
+    if (disponibles.length >= cantidad) { return muestra(disponibles, cantidad); }
+    const elegidas = disponibles.slice();
+    olvidarBanco(banco);
+    let otras = banco.filter(function (p) { return !elegidas.includes(p) && !excluir.includes(p[0]); });
+    const faltan = cantidad - elegidas.length;
+    if (otras.length < faltan) { otras = banco.filter(function (p) { return !elegidas.includes(p); }); }
+    return elegidas.concat(muestra(otras, faltan));
+  }
+  function sacarPreguntas(categoria, mezcla, excluir) {
+    const usadas = leerGuardado(CLAVE_USADAS);
+    const partida = [];
+    const niveles = ["Fácil", "Media", "Difícil"];
+    for (let k = 0; k < 3; k++) {
+      for (const p of elegirDelBanco(bancoDe(categoria, niveles[k]), mezcla[k], usadas, excluir)) {
+        excluir.push(p[0]);
+        partida.push(armarPregunta(p));
+      }
+    }
+    return partida;
+  }
+
+  // ---- Estado de la partida ----
+  const estado = {activo: false, categoria: "Mixto", dificultad: "Normal", mezcla: [5, 5, 5],
+                  premios: calcularPremios(100), jugadores: [], turno: 0, revision: null, publico_panel: false};
+  let votos = {conteos: [0, 0, 0, 0], abierta: false};
+
+  function resumenVotos() {
+    let total = 0;
+    for (const c of votos.conteos) { total = total + c; }
+    const porcentajes = votos.conteos.map(function (c) { return total > 0 ? Math.round(c * 1000 / total) / 10 : 0; });
+    return {conteos: votos.conteos.slice(), porcentajes: porcentajes, total: total, abierta: votos.abierta};
+  }
+  function crearJugador(nombre, preguntas) {
+    return {nombre: nombre, preguntas: preguntas, nivel: 0, eliminadas: [], cincuenta_usado: false,
+            publico_usado: false, amigo_usado: false, banco_usado: false, asegurado: 0, estado: "jugando", premio: 0};
+  }
+  function jugadorActual() { return estado.jugadores[estado.turno]; }
+
+  function datosPregunta(mensaje) {
+    const j = jugadorActual();
+    const nivel = j.nivel;
+    const p = j.preguntas[nivel];
+    const premios = estado.premios;
+    let revision = null;
+    if (estado.revision !== null) {
+      const r = estado.revision;
+      const boton = (r.acerto && nivel + 1 < j.preguntas.length) ? "Siguiente pregunta ➜" : "Continuar ➜";
+      revision = {elegida: r.elegida, correcta: r.correcta, acerto: r.acerto, boton: boton};
+    }
+    const resumen = estado.jugadores.map(function (otro, indice) {
+      return {nombre: otro.nombre, estado: otro.estado, nivel: otro.nivel, activo: indice === estado.turno};
+    });
+    return {jugador: j.nombre, varios: estado.jugadores.length > 1, jugadores: resumen,
+            numero: nivel + 1, total: j.preguntas.length,
+            nivel_pregunta: nivelDePregunta(nivel + 1, estado.mezcla),
+            tema: p[3], icono: ICONOS[p[3]], premio: pesos(premios[nivel]),
+            pregunta: p[0], opciones: p[1], eliminadas: j.eliminadas, revision: revision,
+            cincuenta_disponible: !j.cincuenta_usado, publico_disponible: !j.publico_usado,
+            amigo_disponible: !j.amigo_usado, banco_disponible: !j.banco_usado && nivel > 0,
+            publico_panel: estado.publico_panel && revision === null,
+            asegurado: pesos(j.asegurado), escalera: escalera(nivel, premios),
+            categoria_juego: estado.categoria, dificultad_juego: estado.dificultad,
+            mensaje: mensaje || ""};
+  }
+  function motivoBloqueo() {
+    if (!estado.activo) { return "Primero inicia una partida."; }
+    if (estado.revision !== null) { return "Pulsa el botón para continuar."; }
+    return "";
+  }
+  function cerrarJugador(j, resultado, premio) {
+    j.estado = resultado;
+    j.premio = premio;
+    guardarResultado(j.nombre, j.nivel, premio, estado.categoria, estado.dificultad);
+  }
+  function terminarPartida(mensaje) {
+    estado.activo = false;
+    votos.abierta = false;
+    const tabla = tablaFinal(estado.jugadores);
+    let titulo;
+    if (tabla.length === 1) { titulo = mensaje; }
+    else {
+      const ganadores = tabla.filter(function (f) { return f.puesto === tabla[0].puesto; }).map(function (f) { return f.nombre; });
+      titulo = ganadores.length === 1 ? "🏆 ¡Gana " + ganadores[0] + "!" : "🤝 ¡Empate entre " + ganadores.join(" y ") + "!";
+    }
+    const r = leerRanking();
+    return {fin: true, mensaje: titulo, detalle: mensaje, tabla: tabla, ranking: r[0], partidas: r[1]};
+  }
+  function avanzar(mensaje) {
+    const sig = buscarSiguienteJugador(estado.jugadores, estado.turno);
+    if (sig === -1) { return terminarPartida(mensaje); }
+    estado.turno = sig;
+    estado.publico_panel = false;
+    const j = jugadorActual();
+    marcarUsada(j.preguntas[j.nivel][0]);
+    if (estado.jugadores.length > 1) { mensaje = mensaje + " Turno de " + j.nombre + "."; }
+    return datosPregunta(mensaje.trim());
+  }
+
+  // ---- Funciones que llaman los botones (mismos nombres que en Python) ----
+  function ver_configuracion() {
+    const categorias = ["Mixto"].concat(CATEGORIAS).map(function (nombre) {
+      return {nombre: nombre, icono: ICONOS[nombre], total: contarPreguntas(nombre)};
+    });
+    const dificultades = NOMBRES_DIFICULTAD.map(function (nombre) {
+      const d = DIFICULTADES[nombre];
+      const premios = calcularPremios(d.porcentaje);
+      return {nombre: nombre, icono: d.icono, descripcion: d.descripcion, mezcla: d.mezcla,
+              premio_maximo: pesos(premios[premios.length - 1]), premio_seguro: pesos(premios[4])};
+    });
+    const r = leerRanking();
+    return {categorias: categorias, dificultades: dificultades, max_jugadores: MAX_JUGADORES, ranking: r[0], partidas: r[1]};
+  }
+  function iniciar_juego(nombres, categoria, dificultad) {
+    const v = validarJugadores(nombres);
+    if (!v[0]) { return {error: v[1]}; }
+    if (categoria !== "Mixto" && !CATEGORIAS.includes(categoria)) { return {error: "Elige una categoría válida."}; }
+    if (!DIFICULTADES[dificultad]) { return {error: "Elige una dificultad válida."}; }
+    const config = DIFICULTADES[dificultad];
+    const yaSorteadas = [];
+    const jugadores = v[1].map(function (nombre) { return crearJugador(nombre, sacarPreguntas(categoria, config.mezcla, yaSorteadas)); });
+    Object.assign(estado, {activo: true, categoria: categoria, dificultad: dificultad, mezcla: config.mezcla,
+                           premios: calcularPremios(config.porcentaje), jugadores: jugadores,
+                           turno: 0, revision: null, publico_panel: false});
+    votos = {conteos: [0, 0, 0, 0], abierta: false};
+    marcarUsada(jugadores[0].preguntas[0][0]);
+    return datosPregunta(jugadores.length > 1 ? "Empieza " + jugadores[0].nombre + "." : "");
+  }
+  function responder(indice) {
+    const bloqueo = motivoBloqueo();
+    if (bloqueo) { return {error: bloqueo}; }
+    const j = jugadorActual();
+    const v = validarIndice(indice, j.eliminadas);
+    if (!v[0]) { return {error: v[1]}; }
+    const pregunta = j.preguntas[j.nivel];
+    const acerto = v[1] === pregunta[2];
+    estado.revision = {elegida: v[1], correcta: pregunta[2], acerto: acerto};
+    estado.publico_panel = false;
+    votos.abierta = false;
+    const mensaje = acerto ? "¡Respuesta correcta!"
+      : "Respuesta incorrecta. La correcta era " + LETRAS[pregunta[2]] + ") " + pregunta[1][pregunta[2]] + ".";
+    return datosPregunta(mensaje);
+  }
+  function siguiente() {
+    if (!estado.activo) { return {error: "Primero inicia una partida."}; }
+    if (estado.revision === null) { return {error: "Primero responde la pregunta."}; }
+    const j = jugadorActual();
+    const premios = estado.premios;
+    const acerto = estado.revision.acerto;
+    estado.revision = null;
+    if (!acerto) {
+      cerrarJugador(j, "eliminado", premioAlFallar(j.nivel, j.asegurado, premios));
+      return avanzar("❌ " + j.nombre + " queda eliminado y se lleva " + pesos(j.premio) + ".");
+    }
+    j.nivel = j.nivel + 1;
+    j.eliminadas = [];
+    if (j.nivel === j.preguntas.length) {
+      cerrarJugador(j, "millonario", premios[premios.length - 1]);
+      return avanzar("🎉 ¡" + j.nombre + " respondió las 15 preguntas y es millonario!");
+    }
+    return avanzar("¡Correcto!");
+  }
+  function usar_cincuenta() {
+    const bloqueo = motivoBloqueo();
+    if (bloqueo) { return {error: bloqueo}; }
+    const j = jugadorActual();
+    if (j.cincuenta_usado) { return {error: "Ya usaste el comodín 50:50."}; }
+    const correcta = j.preguntas[j.nivel][2];
+    const dejar = (correcta + enteroAlAzar(1, 3)) % 4;
+    j.eliminadas = opcionesAQuitar(correcta, dejar);
+    j.cincuenta_usado = true;
+    return datosPregunta("Se eliminaron dos opciones incorrectas.");
+  }
+  // Público simulado: en la página de GitHub no hay servidor para votar con QR,
+  // así que se simulan los votos. Cuanto más fácil la pregunta, más acierta el público.
+  function usar_publico() {
+    const bloqueo = motivoBloqueo();
+    if (bloqueo) { return {error: bloqueo}; }
+    const j = jugadorActual();
+    if (j.publico_usado) { return {error: "Ya usaste el comodín del público."}; }
+    const correcta = j.preguntas[j.nivel][2];
+    const nivel = nivelDePregunta(j.nivel + 1, estado.mezcla);
+    const acierto = {"Fácil": 0.75, "Media": 0.55, "Difícil": 0.4}[nivel] + (Math.random() * 0.2 - 0.1);
+    const otras = [];
+    for (let i = 0; i < 4; i++) { if (i !== correcta && !j.eliminadas.includes(i)) { otras.push(i); } }
+    const conteos = [0, 0, 0, 0];
+    const total = enteroAlAzar(80, 120);
+    for (let k = 0; k < total; k++) {
+      if (Math.random() < acierto) { conteos[correcta] = conteos[correcta] + 1; }
+      else { const o = otras[Math.floor(Math.random() * otras.length)]; conteos[o] = conteos[o] + 1; }
+    }
+    votos = {conteos: conteos, abierta: false};
+    j.publico_usado = true;
+    estado.publico_panel = true;
+    return {ok: true, url: "", qr: "", votos: resumenVotos()};
+  }
+  function ver_votos() { return resumenVotos(); }
+  function cerrar_votacion() { votos.abierta = false; return resumenVotos(); }
+  function llamar_amigo(nombre, telefono) {
+    const bloqueo = motivoBloqueo();
+    if (bloqueo) { return {error: bloqueo}; }
+    const j = jugadorActual();
+    if (j.amigo_usado) { return {error: "Ya usaste el comodín del amigo."}; }
+    const n = validarNombre(nombre);
+    if (!n[0]) { return {error: "Nombre del amigo: " + n[1]}; }
+    const t = validarTelefono(telefono);
+    if (!t[0]) { return {error: t[1]}; }
+    const mensaje = mensajeParaAmigo(n[1], j.preguntas[j.nivel], j.eliminadas);
+    j.amigo_usado = true;
+    return {ok: true, titulo: "📞 Consultando a " + n[1] + " (" + formatoTelefono(t[1]) + ")",
+            instruccion: "Tienes " + SEGUNDOS_AMIGO + " segundos: escríbele por WhatsApp o llámalo.",
+            whatsapp: "https://wa.me/57" + t[1] + "?text=" + encodeURIComponent(mensaje), llamada: "tel:+57" + t[1]};
+  }
+  function asegurar_dinero() {
+    const bloqueo = motivoBloqueo();
+    if (bloqueo) { return {error: bloqueo}; }
+    const j = jugadorActual();
+    if (j.banco_usado) { return {error: "Ya aseguraste tu dinero en esta partida."}; }
+    if (j.nivel === 0) { return {error: "Aún no tienes dinero para asegurar. Responde al menos una pregunta."}; }
+    j.asegurado = premioAlRetirarse(j.nivel, estado.premios);
+    j.banco_usado = true;
+    return datosPregunta("🔒 Aseguraste " + pesos(j.asegurado) + ". Si fallas, te lo llevas.");
+  }
+  function retirarse() {
+    const bloqueo = motivoBloqueo();
+    if (bloqueo) { return {error: bloqueo}; }
+    const j = jugadorActual();
+    cerrarJugador(j, "retirado", premioAlRetirarse(j.nivel, estado.premios));
+    return avanzar("🏳️ " + j.nombre + " se retira con " + pesos(j.premio) + ".");
+  }
+
+  return {ver_configuracion: ver_configuracion, iniciar_juego: iniciar_juego, responder: responder,
+          siguiente: siguiente, usar_cincuenta: usar_cincuenta, usar_publico: usar_publico,
+          ver_votos: ver_votos, cerrar_votacion: cerrar_votacion, llamar_amigo: llamar_amigo,
+          asegurar_dinero: asegurar_dinero, retirarse: retirarse};
+})();
+</script>
+<script>
+const LETRAS = ["A", "B", "C", "D"];
+const ICONO_ESTADO = {jugando: "🎮", eliminado: "❌", retirado: "🏳️", millonario: "🏆"};
+let sondeo = null;
+let ultimaClave = "";
+let config = null;
+let nJugadores = 1;
+let categoriaSel = "Mixto";
+let dificultadSel = "Normal";
+
+function aviso(texto, esError) {
+  const a = document.getElementById("aviso");
+  a.textContent = texto;
+  a.style.background = esError ? "#d63b3b" : "#1fa35c";
+  a.style.display = texto ? "block" : "none";
+}
+
+function mostrar(id, visible) {
+  document.getElementById(id).style.display = visible ? "block" : "none";
+}
+
+// ---- Conexión con el motor del juego ----
+// En Colab los botones llamaban a Python; aquí llaman a las mismas funciones escritas en JavaScript (MOTOR).
+async function llamar(nombre, argumentos) {
+  try {
+    if (!MOTOR[nombre]) { throw new Error("función no encontrada: " + nombre); }
+    return MOTOR[nombre].apply(null, argumentos);
+  } catch (e) {
+    aviso("Error: " + e.message, true);
+    return null;
+  }
+}
+
+function detenerSondeo() {
+  if (sondeo !== null) { clearInterval(sondeo); sondeo = null; }
+}
+
+function pintarRanking(d) {
+  const lista = document.getElementById("ranking");
+  lista.innerHTML = "";
+  for (const texto of d.ranking) {
+    const li = document.createElement("li");
+    li.textContent = texto;
+    lista.appendChild(li);
+  }
+  document.getElementById("partidas").textContent = "(" + d.partidas + " partidas jugadas)";
+}
+
+function agregarDiv(padre, clase, texto) {
+  const div = document.createElement("div");
+  div.className = clase;
+  div.textContent = texto;
+  padre.appendChild(div);
+}
+
+function marcarJugadores() {
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById("num" + i).className = "num" + (i === nJugadores ? " sel" : "");
+  }
+}
+
+function reconstruirNombres() {
+  const caja = document.getElementById("nombres");
+  const previos = [];
+  for (const campo of caja.querySelectorAll("input")) { previos.push(campo.value); }
+  caja.innerHTML = "";
+  for (let i = 0; i < nJugadores; i++) {
+    const campo = document.createElement("input");
+    campo.type = "text";
+    campo.maxLength = 20;
+    campo.placeholder = "Nombre del jugador " + (i + 1);
+    campo.value = previos[i] || "";
+    caja.appendChild(campo);
+  }
+}
+
+function elegirJugadores(n) {
+  nJugadores = n;
+  marcarJugadores();
+  reconstruirNombres();
+}
+
+function pintarConfiguracion(c) {
+  config = c;
+  const cats = document.getElementById("cats");
+  cats.innerHTML = "";
+  for (const cat of c.categorias) {
+    const b = document.createElement("button");
+    b.className = "chip" + (cat.nombre === categoriaSel ? " sel" : "");
+    b.textContent = cat.icono + " " + cat.nombre + " · " + cat.total;
+    b.onclick = function () { categoriaSel = cat.nombre; pintarConfiguracion(config); };
+    cats.appendChild(b);
+  }
+  const difs = document.getElementById("difs");
+  difs.innerHTML = "";
+  for (const d of c.dificultades) {
+    const t = document.createElement("button");
+    t.className = "tarjeta" + (d.nombre === dificultadSel ? " sel" : "");
+    agregarDiv(t, "t-titulo", d.icono + " " + d.nombre);
+    agregarDiv(t, "t-linea", d.descripcion);
+    agregarDiv(t, "t-linea", "Preguntas: " + d.mezcla[0] + " fáciles · " + d.mezcla[1] + " medias · " + d.mezcla[2] + " difíciles");
+    agregarDiv(t, "t-premio", "💰 Premio máximo: " + d.premio_maximo);
+    agregarDiv(t, "t-linea", "🔒 Primer premio seguro: " + d.premio_seguro);
+    t.onclick = function () { dificultadSel = d.nombre; pintarConfiguracion(config); };
+    difs.appendChild(t);
+  }
+  marcarJugadores();
+  pintarRanking(c);
+}
+
+async function cargarConfiguracion() {
+  const c = await llamar("ver_configuracion", []);
+  if (c !== null) { pintarConfiguracion(c); }
+}
+
+function pintarVotos(v) {
+  const caja = document.getElementById("barras");
+  caja.innerHTML = "";
+  for (let i = 0; i < 4; i++) {
+    agregarDiv(caja, "", LETRAS[i] + ": " + v.porcentajes[i] + "% (" + v.conteos[i] + " votos)");
+    const barra = document.createElement("div");
+    barra.className = "barra";
+    const relleno = document.createElement("div");
+    relleno.className = "relleno";
+    relleno.style.width = v.porcentajes[i] + "%";
+    barra.appendChild(relleno);
+    caja.appendChild(barra);
+  }
+  document.getElementById("totalVotos").textContent =
+    v.abierta ? "Votos recibidos: " + v.total + " (se actualiza solo)" : "Votación cerrada. Total de votos: " + v.total;
+  if (!v.abierta) {
+    mostrar("zonaQR", false);
+    document.getElementById("btnCerrar").style.display = "none";
+    detenerSondeo();
+  }
+}
+
+function pintarPregunta(d) {
+  mostrar("inicio", false);
+  mostrar("final", false);
+  mostrar("partida", true);
+  const rev = d.revision;
+  const enRevision = rev !== null;
+
+  const fichas = document.getElementById("fichas");
+  fichas.innerHTML = "";
+  for (const j of d.jugadores) {
+    agregarDiv(fichas, "ficha" + (j.activo ? " activa" : "") + (j.estado !== "jugando" ? " fuera" : ""),
+               ICONO_ESTADO[j.estado] + " " + j.nombre + " · " + j.nivel + " ✔");
+  }
+
+  const info = document.getElementById("info");
+  info.innerHTML = "";
+  if (d.varios) { agregarDiv(info, "etq oro", "🎮 Turno de " + d.jugador); }
+  agregarDiv(info, "etq", "Pregunta " + d.numero + "/" + d.total);
+  agregarDiv(info, "etq", d.icono + " " + d.tema);
+  agregarDiv(info, "etq", "Nivel: " + d.nivel_pregunta);
+  agregarDiv(info, "etq oro", "💰 Vale " + d.premio);
+  agregarDiv(info, "etq oro", "🔒 Asegurado: " + d.asegurado);
+
+  document.getElementById("pregunta").textContent = d.pregunta;
+  for (let i = 0; i < 4; i++) {
+    const b = document.getElementById("op" + i);
+    b.textContent = "";
+    const letra = document.createElement("span");
+    letra.className = "letra";
+    letra.textContent = LETRAS[i] + ")";
+    b.appendChild(letra);
+    b.appendChild(document.createTextNode(" " + d.opciones[i]));
+    b.style.visibility = d.eliminadas.includes(i) ? "hidden" : "visible";
+    b.className = "op";
+    b.disabled = enRevision;
+    if (enRevision) {
+      if (i === rev.correcta) { b.className = "op ok"; }
+      else if (i === rev.elegida) { b.className = "op mal"; }
+    }
+  }
+
+  document.getElementById("btn5050").disabled = enRevision || !d.cincuenta_disponible;
+  document.getElementById("btnPublico").disabled = enRevision || !d.publico_disponible;
+  document.getElementById("btnAmigo").disabled = enRevision || !d.amigo_disponible;
+  document.getElementById("btnBanco").disabled = enRevision || !d.banco_disponible;
+  document.getElementById("btnRetiro").disabled = enRevision;
+  mostrar("zonaSiguiente", enRevision);
+  if (enRevision) { document.getElementById("btnSiguiente").textContent = rev.boton; }
+
+  mostrar("panelPublico", d.publico_panel);
+  if (!d.publico_panel) { detenerSondeo(); }
+  const clave = d.jugador + "-" + d.numero;
+  if (enRevision || clave !== ultimaClave) { mostrar("panelAmigo", false); }
+  ultimaClave = clave;
+
+  const esc = document.getElementById("escalera");
+  esc.innerHTML = "";
+  for (const fila of d.escalera) {
+    agregarDiv(esc, "paso" + (fila.actual ? " actual" : "") + (fila.superado ? " superado" : "") + (fila.seguro ? " seguro" : ""),
+               (fila.superado ? "✓ " : "") + fila.texto);
+  }
+  aviso(d.mensaje, enRevision && !rev.acerto);
+}
+
+function pintarFin(d) {
+  detenerSondeo();
+  mostrar("partida", false);
+  mostrar("final", true);
+  document.getElementById("final_mensaje").textContent = d.mensaje;
+  document.getElementById("final_detalle").textContent = d.detalle;
+  const tabla = document.getElementById("tabla");
+  tabla.innerHTML = "";
+  for (const f of d.tabla) {
+    agregarDiv(tabla, "fila", f.puesto + "  " + f.nombre + " — " + f.premio + " · " + f.correctas + " · " + f.detalle);
+  }
+  pintarRanking(d);
+  aviso("", false);
+}
+
+// Cada función de abajo solo envía datos a Python y muestra lo que responde
+async function iniciar() {
+  const nombres = [];
+  for (const campo of document.querySelectorAll("#nombres input")) { nombres.push(campo.value); }
+  const d = await llamar("iniciar_juego", [nombres, categoriaSel, dificultadSel]);
+  if (d === null) return;
+  if (d.error) { aviso(d.error, true); return; }
+  ultimaClave = "";
+  pintarPregunta(d);
+}
+
+async function responder(i) {
+  const d = await llamar("responder", [i]);
+  if (d === null) return;
+  if (d.error) { aviso(d.error, true); return; }
+  pintarPregunta(d);
+}
+
+async function siguiente() {
+  const d = await llamar("siguiente", []);
+  if (d === null) return;
+  if (d.error) { aviso(d.error, true); return; }
+  if (d.fin) { pintarFin(d); } else { pintarPregunta(d); }
+}
+
+async function cincuenta() {
+  const d = await llamar("usar_cincuenta", []);
+  if (d === null) return;
+  if (d.error) { aviso(d.error, true); return; }
+  pintarPregunta(d);
+}
+
+async function abrirPublico() {
+  aviso("El público está votando…", false);
+  const d = await llamar("usar_publico", []);
+  if (d === null) return;
+  if (d.error) { aviso(d.error, true); return; }
+  document.getElementById("qr").src = d.qr;
+  document.getElementById("urlVoto").textContent = d.url;
+  mostrar("panelPublico", true);
+  mostrar("zonaQR", true);
+  document.getElementById("btnCerrar").style.display = "inline-block";
+  document.getElementById("btnPublico").disabled = true;
+  pintarVotos(d.votos);
+  detenerSondeo();
+  sondeo = setInterval(actualizarVotos, 2000);
+  aviso("👥 Así votó el público.", false);
+}
+
+async function actualizarVotos() {
+  const d = await llamar("ver_votos", []);
+  if (d !== null) { pintarVotos(d); }
+}
+
+async function cerrarVotacion() {
+  const d = await llamar("cerrar_votacion", []);
+  if (d !== null) { pintarVotos(d); }
+}
+
+function abrirAmigo() {
+  mostrar("panelAmigo", true);
+  mostrar("amigoForm", true);
+  mostrar("amigoResultado", false);
+}
+
+function cancelarAmigo() {
+  mostrar("panelAmigo", false);
+}
+
+async function consultarAmigo() {
+  const d = await llamar("llamar_amigo", [document.getElementById("amigoNombre").value,
+                                          document.getElementById("amigoTelefono").value]);
+  if (d === null) return;
+  if (d.error) { aviso(d.error, true); return; }
+  document.getElementById("amigoTitulo").textContent = d.titulo;
+  document.getElementById("amigoInstruccion").textContent = d.instruccion;
+  document.getElementById("linkWhatsapp").href = d.whatsapp;
+  document.getElementById("linkLlamar").href = d.llamada;
+  mostrar("amigoForm", false);
+  mostrar("amigoResultado", true);
+  document.getElementById("btnAmigo").disabled = true;
+  aviso("", false);
+}
+
+async function asegurar() {
+  const d = await llamar("asegurar_dinero", []);
+  if (d === null) return;
+  if (d.error) { aviso(d.error, true); return; }
+  pintarPregunta(d);
+}
+
+async function retirarse() {
+  const d = await llamar("retirarse", []);
+  if (d === null) return;
+  if (d.error) { aviso(d.error, true); return; }
+  if (d.fin) { pintarFin(d); } else { pintarPregunta(d); }
+}
+
+function nuevaPartida() {
+  mostrar("final", false);
+  mostrar("inicio", true);
+  aviso("", false);
+  cargarConfiguracion();
+}
+
+reconstruirNombres();
+cargarConfiguracion();
+</script>
+</body>
+</html>
